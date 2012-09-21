@@ -4,7 +4,7 @@ Hello World
 Your first app!
 ---------------
 
-Our first happstack application is a simple server that responds to
+Our first Happstack application is a simple server that responds to
 all requests with the string, `Hello, World!`.
 
 
@@ -15,7 +15,7 @@ all requests with the string, `Hello, World!`.
 > main :: IO ()
 > main = simpleHTTP nullConf $ ok "Hello, World!"
 
-Source code for the app is [here](http://www.happstack.com/HelloWorld.hs).
+Source code for the app is [here](http://srclink/HelloWorld.hs).
 
 To build the application run:
 
@@ -35,18 +35,28 @@ If we point `curl` at the app we get the following output:
      $ curl http://localhost:8000/
     Hello, World!
 
+`curl` is a command-line utility which can be used to create many
+types of HTTP requests. Unlike a browser, it does not attempt to
+render the results, it just prints the raw response to the
+console. `curl` is not required by Happstack or this book, but it is a
+useful tool for web development.
+
+`curl` is not part of Happstack. The official curl website is [http://curl.haxx.se](http://curl.haxx.se). 
+
 How it works
 ------------
 
-### Listening for HTTP requests
+*** Listening for HTTP requests
 
-The top-level function `simpleHTTP` is what actually starts the program listening for incoming HTTP requests.
+The `simpleHTTP` function is what actually starts the program listening for incoming HTTP requests:
 
 ~~~~ {.haskell}
 simpleHTTP :: (ToMessage a) => Conf -> ServerPartT IO a -> IO ()
 ~~~~
 
-### Configuring the HTTP listener
+We'll examine the various parts of this type signature in the following sections.
+
+*** Configuring the HTTP listener
 
 The first argument is some simple server configuration information. It is defined as:
 
@@ -61,16 +71,21 @@ data Conf = Conf { port       :: Int
 ~~~~
 
 
-<dl>
- <dt>`port`</dt>
- <dd>the TCP port to listen on for incoming connection</dd>
- <dt>`validator`</dt>   
- <dd>on-the-fly validation of output during development</dd> 
- <dt>`logAccess`</dt>
- <dd>logging function for HTTP requests</dd>
- <dt>`timeout`</dt>
- <dd>number of seconds to wait before killing an inactive connection</dd>
-</dl>
+`port`
+
+:    the TCP port to listen on for incoming connection
+
+`validator`
+
+:    on-the-fly validation of output during development
+
+`logAccess`
+
+:    logging function for HTTP requests
+
+`timeout`
+
+:    number of seconds to wait before killing an inactive connection
 
 The default config is `nullConf` which is simply defined as:
 
@@ -83,27 +98,27 @@ nullConf = Conf { port      = 8000
                 }
 ~~~~
 
-### Processing a `Request`
+*** Processing a `Request`
 
 The second argument is a bit more interesting. The `ServerPartT IO a` is the code that actually processes an incoming HTTP `Request` and generates a `Response`. The `ServerPartT IO` monad is essentially a fancy way of writing a function with the type:
 
 ~~~~ {.haskell}
-> Request -> IO Response
+Request -> IO Response
 ~~~~
 
 `simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return the `Response` to the client. When developing your server part, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
 
-### Setting the HTTP response code
+*** Setting the HTTP response code
 
 In this example, our server part is simply:
 
 ~~~~ {.haskell}
-> ok "Hello, World!"
+ok "Hello, World!"
 ~~~~
 
-`ok` is one of several combinators which can be used to set the HTTP response code. In this case, it will set the response code to `200 OK`. <a href="http://happstack.com/docs/0.5.0/happstack-server/Happstack-Server-SimpleHTTP.html">`Happstack.Server.SimpleHTTP`</a> contains similar functions for the common HTTP response codes including, `notFound`, `seeOther`, `badRequest` and more. These functions all act like the normal `return` function, except they also set the response code.
+`ok` is one of several combinators which can be used to set the HTTP response code. In this case, it will set the response code to `200 OK`. `Happstack.Server.SimpleHTTP` contains similar functions for the common HTTP response codes including, `notFound`, `seeOther`, `badRequest` and more. These functions all act like the normal `return` function, except they also set the response code.
 
-### Creating a `Response`
+*** Creating a `Response`
 
 The body of the response will be `"Hello, World!"`.
 
@@ -115,3 +130,4 @@ main = simpleHTTP nullConf $ ok (toResponse "Hello, World!")
 ~~~~
 
 The `toResponse` function takes care of setting the `Content-type` and converting the value into a lazy `ByteString` which will be sent back to the client. Happstack comes with pre-defined `ToMessage` instances for many types such as `Text.Html.Html`, `Text.XHtml.Html`, `String`, the types from HSP, and more.
+
