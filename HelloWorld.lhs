@@ -46,7 +46,7 @@ useful tool for web development.
 How it works
 ------------
 
-*** Listening for HTTP requests
+### Listening for HTTP requests
 
 The `simpleHTTP` function is what actually starts the program listening for incoming HTTP requests:
 
@@ -56,7 +56,7 @@ simpleHTTP :: (ToMessage a) => Conf -> ServerPartT IO a -> IO ()
 
 We'll examine the various parts of this type signature in the following sections.
 
-*** Configuring the HTTP listener
+### Configuring the HTTP listener
 
 The first argument is some simple server configuration information. It is defined as:
 
@@ -98,7 +98,7 @@ nullConf = Conf { port      = 8000
                 }
 ~~~~
 
-*** Processing a `Request`
+### Processing a `Request`
 
 The second argument is a bit more interesting. The `ServerPartT IO a` is the code that actually processes an incoming HTTP `Request` and generates a `Response`. The `ServerPartT IO` monad is essentially a fancy way of writing a function with the type:
 
@@ -108,7 +108,7 @@ Request -> IO Response
 
 `simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return the `Response` to the client. When developing your server part, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
 
-*** Setting the HTTP response code
+### Setting the HTTP response code
 
 In this example, our server part is simply:
 
@@ -118,7 +118,7 @@ ok "Hello, World!"
 
 `ok` is one of several combinators which can be used to set the HTTP response code. In this case, it will set the response code to `200 OK`. `Happstack.Server.SimpleHTTP` contains similar functions for the common HTTP response codes including, `notFound`, `seeOther`, `badRequest` and more. These functions all act like the normal `return` function, except they also set the response code.
 
-*** Creating a `Response`
+### Creating a `Response`
 
 The body of the response will be `"Hello, World!"`.
 

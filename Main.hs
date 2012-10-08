@@ -4,7 +4,13 @@ import Control.Applicative ((<$>))
 import Development.Shake
 import Development.Shake.FilePath
 
-chapters = ["title.txt", "HelloWorld.lhs"]
+chapters :: [FilePath]
+chapters = [ "title.txt"
+           , "HelloWorld.lhs"
+           , "MonadPlus.lhs"
+           , "RouteFiltersIntro.md"
+           , "Dir.lhs"
+           ]
 
 allChapters = "_build/allChapters.txt"
 
@@ -12,7 +18,7 @@ main :: IO ()
 main = shake shakeOptions $ do
          want ["_build/book.html", "_build/book.pdf"]
          allChapters *> \out ->
-             do need chapters
+             do need ("Main.hs" : chapters )
                 allChaptersTxt <- concat <$> mapM readFile' chapters
                 writeFileChanged allChapters allChaptersTxt
          "_build/*.html" *> \out ->
