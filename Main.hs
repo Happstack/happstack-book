@@ -10,6 +10,7 @@ chapters = [ "title.txt"
            , "MonadPlus.lhs"
            , "RouteFiltersIntro.md"
            , "Dir.lhs"
+           , "Path.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"
@@ -27,4 +28,3 @@ main = shake shakeOptions $ do
          "_build/*.pdf" *> \out ->
              do need [allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
-                              
