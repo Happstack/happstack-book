@@ -10,6 +10,8 @@ chapters = [ "title.txt"
            , "MonadPlus.lhs"
            , "RouteFiltersIntro.md"
            , "Dir.lhs"
+           , "Dir2.lhs"
+           , "Dirs.lhs"
            , "Path.lhs"
            ]
 
