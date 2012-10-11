@@ -7,12 +7,15 @@ import Development.Shake.FilePath
 chapters :: [FilePath]
 chapters = [ "title.txt"
            , "HelloWorld.lhs"
-           , "MonadPlus.lhs"
-           , "RouteFiltersIntro.md"
-           , "Dir.lhs"
-           , "Dir2.lhs"
-           , "Dirs.lhs"
-           , "Path.lhs"
+           , "RouteFilters/MonadPlus.lhs"
+           , "RouteFilters/RouteFiltersIntro.md"
+           , "RouteFilters/Dir.lhs"
+           , "RouteFilters/Dir2.lhs"
+           , "RouteFilters/Dirs.lhs"
+           , "RouteFilters/Path.lhs"
+           , "RouteFilters/FromReqURI.lhs"
+           , "RouteFilters/Method.lhs"
+           , "RouteFilters/MatchMethod.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"

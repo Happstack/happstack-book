@@ -1,5 +1,6 @@
 Matching on variable path segments
 ----------------------------------
+
 Often times a path segment will contain a variable value we want to
 extract and use, such as a number or a string. We can use the
 `path` combinator to do that.
@@ -35,3 +36,4 @@ Source code for the app is [here](http://srclink/Path.hs).
 
 Now, if we start the app and point our browser at: [http://localhost:8000/hello/World](http://localhost:8000/hello/World) we get the response `"Hello, World"`.
 if we point it at [http://localhost:8000/hello/Haskell](http://localhost:8000/hello/Haskell), we get `"Hello, Haskell"`.
+
