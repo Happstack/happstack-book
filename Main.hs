@@ -20,6 +20,7 @@ chapters = [ "title.txt"
            , "Templates/TemplatesIntro.md"
            , "Templates/HelloBlaze.lhs"
            , "Templates/TemplatesHSP.lhs"
+           , "Templates/TemplatesHSPI18n.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"
