@@ -19,6 +19,7 @@ chapters = [ "title.txt"
            , "RouteFilters/OtherRouteFilters.md"
            , "Templates/TemplatesIntro.md"
            , "Templates/HelloBlaze.lhs"
+           , "Templates/TemplatesHSP.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"
