@@ -59,6 +59,3 @@ Each templating system has it's own set of advantages and drawbacks.
   <dt>more to come..</dt><dd></dd>
 </dl>
 
-include "TemplatesHeist.lhs"
-include "JMacro.lhs"
-
