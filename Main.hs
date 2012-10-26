@@ -38,6 +38,10 @@ chapters = [ "title.txt"
            , "RequestData/CookieLife.lhs"
            , "RequestData/CookieIssues.lhs"
            , "RequestData/CookieFeatures.md"
+           , "FileServing/FileServing.md"
+           , "FileServing/FileServingDirectory.lhs"
+           , "FileServing/FileServingSingle.lhs"
+           , "FileServing/FileServingAdvanced.md"
            ]
 
 allChapters = "_build/allChapters.txt"
