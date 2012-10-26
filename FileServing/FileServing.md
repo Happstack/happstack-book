@@ -11,4 +11,3 @@ The file serving capabilities can be divided into two categories:
  2. Serving an specific, individual file on disk, whose name may be different from the URI
 
 
-\ #include "FileServingAdvanced.lhs"

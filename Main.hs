@@ -42,6 +42,7 @@ chapters = [ "title.txt"
            , "FileServing/FileServingDirectory.lhs"
            , "FileServing/FileServingSingle.lhs"
            , "FileServing/FileServingAdvanced.md"
+           , "Reform/Reform.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"
