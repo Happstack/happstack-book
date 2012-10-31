@@ -48,5 +48,3 @@ perform remote queries, etc.
 Now that you have a vague idea how `acid-state` works, let's clarify
 it by looking at some examples.
 
-\#include "IxSetDataLens.lhs"
-\#include "AcidStateAdvanced.lhs"
