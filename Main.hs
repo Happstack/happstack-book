@@ -52,6 +52,7 @@ chapters = [ "title.txt"
            , "AcidState/IxSet.lhs"
            , "AcidState/IxSetDataLens.lhs"
            , "AcidState/AcidStateAdvanced.lhs"
+           , "Appendix/TemplateHaskell.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"
@@ -64,8 +65,8 @@ main = shake shakeOptions $ do
                 allChaptersTxt <- concat <$> mapM readFile' chapters
                 writeFileChanged allChapters allChaptersTxt
          "_build/*.html" *> \out ->
-             do need [allChapters]
+             do need ["Main.hs",  allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","-t","html","-s","--toc","--chapters","-o", out, allChapters]
          "_build/*.pdf" *> \out ->
-             do need [allChapters]
-                system' "pandoc" ["-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
+             do need ["Main.hs", allChapters]
+                system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
