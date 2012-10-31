@@ -43,6 +43,11 @@ chapters = [ "title.txt"
            , "FileServing/FileServingSingle.lhs"
            , "FileServing/FileServingAdvanced.md"
            , "Reform/Reform.lhs"
+           , "AcidState/AcidStateIntro.md"
+           , "AcidState/AcidStateCounter.lhs"
+           , "AcidState/IxSet.lhs"
+           , "AcidState/IxSetDataLens.lhs"
+           , "AcidState/AcidStateAdvanced.lhs"
            ]
 
 allChapters = "_build/allChapters.txt"
