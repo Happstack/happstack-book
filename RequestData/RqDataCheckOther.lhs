@@ -33,7 +33,7 @@ within range:
 >
 > oneToTenPart :: ServerPart String
 > oneToTenPart =
->     do r <- getDataFn (lookRead "i" `checkRq` (inRange 1 10))
+>     do r <- getDataFn (lookRead "i" `checkRq` (inRange (1 :: Int) 10))
 >        case r of
 >          (Left e) ->
 >              badRequest $ unlines e
