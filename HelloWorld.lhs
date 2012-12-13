@@ -37,11 +37,40 @@ If we point `curl` at the app we get the following output:
 
 `curl` is a command-line utility which can be used to create many
 types of HTTP requests. Unlike a browser, it does not attempt to
-render the results, it just prints the raw response to the
-console. `curl` is not required by Happstack or this book, but it is a
-useful tool for web development.
+render the results, it just prints the body of the response to the
+console.
 
-`curl` is not part of Happstack. The official curl website is [http://curl.haxx.se](http://curl.haxx.se). 
+If you run `curl` with the `-v` option it will provide verbose output
+which includes the headers sent back and forth between curl and the
+server:
+
+~~~~
+$ curl -v http://localhost:8000/
+* About to connect() to localhost port 8000 (#0)
+*   Trying 127.0.0.1... connected
+> GET / HTTP/1.1
+> User-Agent: curl/7.22.0 (x86_64-pc-linux-gnu)
+> Host: localhost:8000
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< Transfer-Encoding: chunked
+< Connection: Keep-Alive
+< Content-Type: text/plain; charset=UTF-8
+< Date: Thu, 13 Dec 2012 00:19:01 GMT
+< Server: Happstack/7.0.7
+< 
+* Connection #0 to host localhost left intact
+* Closing connection #0
+Hello, World!
+~~~~
+
+This can sometimes be useful for debugging why your site is not
+working as you expect.
+
+`curl` is not required by Happstack or this book, but it is a useful
+tool for web development. `curl` is not part of Happstack. The
+official curl website is [http://curl.haxx.se](http://curl.haxx.se).
 
 How it works
 ------------
