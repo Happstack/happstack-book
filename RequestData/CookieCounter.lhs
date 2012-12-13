@@ -52,13 +52,12 @@ The cookie functions work just like the other `HasRqData` functions. That means 
 The following example puts all the pieces together. It uses the cookie to store a simple counter specifying how many requests have been made:
 
 > module Main where
-> import Control.Monad
-> import Control.Monad.Trans
-> import Happstack.Server
-> import Control.Monad     ( msum )
-> import Happstack.Server  ( CookieLife(Session), ServerPart, addCookie
->                          , look, mkCookie, nullConf, ok, readCookieValue
->                          , simpleHTTP )
+>
+> import Control.Monad.Trans ( liftIO )
+> import Control.Monad       ( msum, mzero )
+> import Happstack.Server    ( CookieLife(Session), Request(rqPaths), ServerPart
+>                            , addCookie , askRq, look, mkCookie, nullConf
+>                            , ok, readCookieValue, simpleHTTP )
 >
 > homePage :: ServerPart String
 > homePage =
@@ -66,7 +65,7 @@ The following example puts all the pieces together. It uses the cookie to store 
 >               liftIO $ print (rqPaths rq)
 >               mzero
 >          , do requests <- readCookieValue "requests"
->               addCookie Session (mkCookie "requests" (show (requests + 1)))
+>               addCookie Session (mkCookie "requests" (show (requests + (1 :: Int))))
 >               ok $ "You have made " ++ show requests ++ " requests to this site."
 >          , do addCookie Session (mkCookie "requests" (show 2))
 >               ok $ "This is your first request to this site."
