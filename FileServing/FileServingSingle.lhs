@@ -25,7 +25,7 @@ The first argument is a function which calculates the mime-type for a `FilePath`
 
 
 ~~~~ {.haskell}
-serveFile guessContentTypeM "/path/to/photos/photo_medium.jpg"
+serveFile (guessContentTypeM mimeTypes) "/path/to/photos/photo_medium.jpg"
 ~~~~
 
 
