@@ -197,7 +197,7 @@ In order to keep our type signatures sane, it is convenient to create an applica
 
 
 
-Instead of have one error type for all the forms, we could have per-form error types -- or even just use `String`. The advantage of using a type is that it makes it easier to provide I18N translations, or for users of a library to customize the text of the error messages. The disadvantage of using a custom type over a plain `String` is that it can make it more difficult to combine forms into larger forms since they must all have the same error type. Additionally, it is a bit more work to create the error type and the `FormError` instance.
+Instead of having one error type for all the forms, we could have per-form error types -- or even just use `String`. The advantage of using a type is that it makes it easier to provide I18N translations, or for users of a library to customize the text of the error messages. The disadvantage of using a custom type over a plain `String` is that it can make it more difficult to combine forms into larger forms since they must all have the same error type. Additionally, it is a bit more work to create the error type and the `FormError` instance.
 
 We will want an `EmbedAsChild` instance so that we can easily embed the errors in our HTML:
 
@@ -738,7 +738,7 @@ instance (Functor m, Monoid view, Monad m) => Applicative (Form m input error vi
 
 With this instance, `reform` feels and works almost exactly like `digestive-functors <= 0.2`.
 
-But, for the `provePostForm`, that `Applicative` instance won't work for us. `mkMessage` has the type:
+But, for the `provenPostForm`, that `Applicative` instance won't work for us. `mkMessage` has the type:
 
 
 ~~~~{.haskell}
@@ -854,7 +854,7 @@ Here is a main function that ties all the examples together:
 
 
 
-There is nothing `reform` specific about.
+There is nothing `reform` specific about it.
 
 Source code for the app is [here](http://srclink/Reform.hs).
 

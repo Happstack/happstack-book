@@ -23,8 +23,6 @@ within range:
 > import Happstack.Server (ServerPart, badRequest, nullConf, ok, simpleHTTP)
 > import Happstack.Server.RqData (RqData, checkRq, getDataFn, look, lookRead)
 >
-> data Vote = Yay | Nay deriving (Eq, Ord, Read, Show, Enum, Bounded)
->
 > inRange :: (Show a, Ord a) => a -> a -> a -> Either String a
 > inRange lower upper a
 >     | lower <= a && a <= upper = Right a

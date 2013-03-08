@@ -17,9 +17,11 @@ all requests with the string, `Hello, World!`.
 
 Source code for the app is [here](http://srclink/HelloWorld.hs).
 
+If you have not already installed Happstack -- you will need to do that first. You can find instructions on how to install Happstack at [http://happstack.com/page/view-page-slug/2/download](http://happstack.com/page/view-page-slug/2/download).
+
 To build the application run:
 
-    $ ghc --make -threaded HelloWorld.hs -o helloworld
+    $ ghc -threaded HelloWorld.hs -o helloworld
 
 The executable will be named `helloworld`.
 
@@ -28,9 +30,9 @@ Alternatively, you can use `runhaskell` and avoid the compilation step.
     $ runhaskell HelloWorld.hs
 
 Run this app and point your browser at [`http://localhost:8000/`](http://localhost:8000/). (assuming
-you are building the program on your local machine.)
+you are building the program on your local machine.) The page should load and say `"Hello, World!"`.
 
-If we point `curl` at the app we get the following output:
+Alternatively, we can use `curl`:
 
      $ curl http://localhost:8000/
     Hello, World!
@@ -45,24 +47,24 @@ which includes the headers sent back and forth between curl and the
 server:
 
 ~~~~
-$ curl -v http://localhost:8000/
-* About to connect() to localhost port 8000 (#0)
-*   Trying 127.0.0.1... connected
-> GET / HTTP/1.1
-> User-Agent: curl/7.22.0 (x86_64-pc-linux-gnu)
-> Host: localhost:8000
-> Accept: */*
-> 
-< HTTP/1.1 200 OK
-< Transfer-Encoding: chunked
-< Connection: Keep-Alive
-< Content-Type: text/plain; charset=UTF-8
-< Date: Thu, 13 Dec 2012 00:19:01 GMT
-< Server: Happstack/7.0.7
-< 
-* Connection #0 to host localhost left intact
-* Closing connection #0
-Hello, World!
+ $ curl -v http://localhost:8000/
+ * About to connect() to localhost port 8000 (#0)
+ *   Trying 127.0.0.1... connected
+ > GET / HTTP/1.1
+ > User-Agent: curl/7.22.0 (x86_64-pc-linux-gnu)
+ > Host: localhost:8000
+ > Accept: */*
+ >
+ < HTTP/1.1 200 OK
+ < Transfer-Encoding: chunked
+ < Connection: Keep-Alive
+ < Content-Type: text/plain; charset=UTF-8
+ < Date: Thu, 13 Dec 2012 00:19:01 GMT
+ < Server: Happstack/7.0.7
+ <
+ * Connection #0 to host localhost left intact
+ * Closing connection #0
+ Hello, World!
 ~~~~
 
 This can sometimes be useful for debugging why your site is not
@@ -72,8 +74,8 @@ working as you expect.
 tool for web development. `curl` is not part of Happstack. The
 official curl website is [http://curl.haxx.se](http://curl.haxx.se).
 
-How it works
-------------
+The parts of `Hello World`
+-------------------------
 
 ### Listening for HTTP requests
 
@@ -90,15 +92,15 @@ We'll examine the various parts of this type signature in the following sections
 The first argument is some simple server configuration information. It is defined as:
 
 ~~~~ {.haskell}
-data Conf = Conf { port       :: Int
-                 , validator  :: Maybe (Response -> IO Response) 
-                 , logAccess  :: forall t. FormatTime t => 
-                      Maybe (String -> String -> t -> String -> Int -> 
-                             Integer -> String -> String -> IO ())
-                 , timeout    :: Int
-                 }
+data Conf = Conf
+    { port       :: Int
+    , validator  :: Maybe (Response -> IO Response)
+    , logAccess  :: forall t. FormatTime t => Maybe (LogAccess t)
+    , timeout    :: Int
+    }
 ~~~~
 
+The fields can be described as:
 
 `port`
 
@@ -116,47 +118,69 @@ data Conf = Conf { port       :: Int
 
 :    number of seconds to wait before killing an inactive connection
 
+
 The default config is `nullConf` which is simply defined as:
 
 ~~~~ {.haskell}
 -- | Default configuration contains no validator and the port is set to 8000
 nullConf :: Conf
-nullConf = Conf { port      = 8000
-                , validator  = Nothing
-                , logAccess = Just logMAccess
-                }
+nullConf = Conf
+    { port      = 8000
+    , validator = Nothing
+    , logAccess = Just logMAccess
+    , timeout   = 30
+    }
 ~~~~
 
 ### Processing a `Request`
 
-The second argument is a bit more interesting. The `ServerPartT IO a` is the code that actually processes an incoming HTTP `Request` and generates a `Response`. The `ServerPartT IO` monad is essentially a fancy way of writing a function with the type:
+The second argument is a bit more interesting. It is the handler which processes an incoming HTTP `Request` and generates a `Response`. `ServerPartT IO a` is essentially a fancy way of writing a function with the type:
 
 ~~~~ {.haskell}
-Request -> IO Response
+Request -> IO a
 ~~~~
 
-`simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return the `Response` to the client. When developing your server part, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
+`simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return the `Response` to the client. When developing your handler, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
 
 ### Setting the HTTP response code
 
-In this example, our server part is simply:
+In this example, our handler is simply:
 
 ~~~~ {.haskell}
-ok "Hello, World!"
+ok "Hello, World!" :: ServerPartT IO String
 ~~~~
 
-`ok` is one of several combinators which can be used to set the HTTP response code. In this case, it will set the response code to `200 OK`. `Happstack.Server.SimpleHTTP` contains similar functions for the common HTTP response codes including, `notFound`, `seeOther`, `badRequest` and more. These functions all act like the normal `return` function, except they also set the response code.
+`ok` is one of several combinators which can be used to set the HTTP response code. In this case, it will set the response code to `200 OK`.  The type signature for `ok` can be simplified to:
+
+~~~~ {.haskell}
+ok :: a -> ServerPartT IO a
+~~~~
+
+`ok` acts much like `return` except it also sets the HTTP response code for a `Response`.
+
+`Happstack.Server.SimpleHTTP` contains similar functions for the common HTTP response codes including, `notFound`, `seeOther`, `badRequest` and more.
 
 ### Creating a `Response`
 
-The body of the response will be `"Hello, World!"`.
+The `ToMessage` class is used to turn values of different types into HTTP responses. It contains three methods:
 
-The `String` `"Hello, World!"` is turned into a `Response` because simpleHTTP calls `toResponse` from the `ToMessage` class on it. Often times we will opt to make this call explicit rather than implicit. For example:
+~~~~ {.haskell}
+class ToMessage a where
+  toContentType :: a -> ByteString
+  toMessage     :: a -> Lazy.ByteString
+  toResponse    :: a -> Response
+~~~~
+
+A vast majority of the time we only call the `toResponse` method.
+
+`simpleHTTP` automatically calls `toResponse` to convert the value returned by the handler into a `Response` -- so we did not have to call `toResponse` explicitly. It converted the `String` `"Hello, World!"` into a `Response` with the content-type `"text/plain"` and the message body `"Hello, World!"`
+
+Often times we will opt to explicitly call `toResponse`. For example:
 
 ~~~~ {.haskell}
 main :: IO ()
 main = simpleHTTP nullConf $ ok (toResponse "Hello, World!")
 ~~~~
 
-The `toResponse` function takes care of setting the `Content-type` and converting the value into a lazy `ByteString` which will be sent back to the client. Happstack comes with pre-defined `ToMessage` instances for many types such as `Text.Html.Html`, `Text.XHtml.Html`, `String`, the types from HSP, and more.
+Happstack comes with pre-defined `ToMessage` instances for many types such as `Text.Html.Html`, `Text.XHtml.Html`, `String`, the types from HSP, and more.
 
