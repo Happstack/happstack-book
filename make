@@ -1,3 +1,4 @@
+#!/usr/bin/runhaskell
 module Main where
 
 import Control.Applicative ((<$>))
@@ -17,6 +18,7 @@ chapters = [ "title.txt"
            , "RouteFilters/Method.lhs"
            , "RouteFilters/MatchMethod.lhs"
            , "RouteFilters/OtherRouteFilters.md"
+{-
            , "Templates/TemplatesIntro.md"
            , "Templates/HelloBlaze.lhs"
            , "Templates/TemplatesHSP.lhs"
@@ -53,20 +55,32 @@ chapters = [ "title.txt"
            , "AcidState/IxSetDataLens.lhs"
            , "AcidState/AcidStateAdvanced.lhs"
            , "Appendix/TemplateHaskell.lhs"
+-}
            ]
 
-allChapters = "_build/allChapters.txt"
+allChapters = "_build/allChapters.md"
 
 main :: IO ()
 main = shake shakeOptions $ do
-         want ["_build/book.html", "_build/book.pdf"]
+         want ["_build/book.html", "_build/book.pdf", "_build/book.md"]
          allChapters *> \out ->
-             do need ("Main.hs" : chapters )
+             do need ("make" : chapters )
                 allChaptersTxt <- concat <$> mapM readFile' chapters
                 writeFileChanged allChapters allChaptersTxt
-         "_build/*.html" *> \out ->
-             do need ["Main.hs",  allChapters]
-                system' "pandoc" ["-f", "markdown+lhs","-t","html","-s","--toc","--chapters","-o", out, allChapters]
-         "_build/*.pdf" *> \out ->
-             do need ["Main.hs", allChapters]
+                system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", allChapters]
+                system' "sed" ["-i", "s/%%%/\\#\\#\\#/", allChapters]
+         "_build/book.html" *> \out ->
+             do need ["make",  allChapters]
+                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
+         "_build/book.pdf" *> \out ->
+             do need ["make", allChapters]
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
+         "_build/book.md" *> \out ->
+             do need ["make",  allChapters]
+                let allChapters_ = (allChapters++"_")
+                system' "cp" [allChapters, allChapters_]
+                system' "sed" ["-i", "s/import Happstack.Server/import Happstack.Server.Env/", allChapters_]
+                system' "pandoc" ["-f", "markdown+lhs","-t","markdown_soh","-o", out, allChapters_]
+                system' "sed" ["-i", "s/sourceCode literate haskell/haskell web active/", out]
+
+

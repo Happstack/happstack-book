@@ -6,13 +6,13 @@ The method routing functions use a class `(MatchMethod method)` instead of the c
 
 
 ~~~~ {.haskell}
-> class MatchMethod m where
->     matchMethod :: m -> Method -> Bool
->
-> instance MatchMethod Method           where ...
-> instance MatchMethod [Method]         where ...
-> instance MatchMethod (Method -> Bool) where ...
-> instance MatchMethod ()               where ...
+class MatchMethod m where
+    matchMethod :: m -> Method -> Bool
+
+instance MatchMethod Method           where ...
+instance MatchMethod [Method]         where ...
+instance MatchMethod (Method -> Bool) where ...
+instance MatchMethod ()               where ...
 ~~~~
 
 
@@ -34,9 +34,7 @@ handling this automatically in most cases.
 >        [ do methodM [GET, HEAD]
 >             ok $ "Hello, World\n"
 >        ]
->
 
-Source code for the app is [here](http://srclink/MatchMethod.hs).
 
 We can now use curl to do a normal `GET` request, or we can
 use the `-I` flag which does a `HEAD` request:

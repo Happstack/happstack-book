@@ -1,3 +1,4 @@
+
 Using `dir` to match on static path components
 ----------------------------------------------
 
@@ -6,14 +7,15 @@ We can use `dir` to handle components of the URI path which are static. For exam
 > module Main where
 >
 > import Control.Monad
-> import Happstack.Server (nullConf, simpleHTTP, ok, dir)
+> import Happstack.Server (nullConf, simpleHTTP, ok, dir, seeOther)
 >
 > main :: IO ()
-> main = simpleHTTP nullConf $ msum [ dir "hello"    $ ok "Hello, World!"
->                                   , dir "goodbye"  $ ok "Goodbye, World!"
->                                   ]
+> main = simpleHTTP nullConf $ msum
+>     [ dir "hello"    $ ok "Hello, World!"
+>     , dir "goodbye"  $ ok "Goodbye, World!"
+>     , seeOther "/hello" "/hello"
+>     ]
 
-Source code for the app is [here](http://srclink/Dir.hs).
 
 If we start the app and point our browser at [http://localhost:8000/hello](http://localhost:8000/hello) we get the `hello` message, and if we point it at [http://localhost:8000/goodbye](http://localhost:8000/goodbye), we get the `goodbye` message.
 

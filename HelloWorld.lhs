@@ -7,17 +7,18 @@ Your first app!
 Our first Happstack application is a simple server that responds to
 all requests with the string, `Hello, World!`.
 
-
 > module Main where
->
+> 
 > import Happstack.Server (nullConf, simpleHTTP, toResponse, ok)
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ ok "Hello, World!"
 
-Source code for the app is [here](http://srclink/HelloWorld.hs).
+If you are reading this on [School of Haskell](https://www.fpcomplete.com/), the examples import the module `Happstack.Server.Env` instead of `Happstack.Server`. This is a (hopefully) temporary hack so that the interactive code examples work on School of Haskell. To run code from School of Haskell locally simply replace `Happstack.Server.Env` with `Happstack.Server`.
 
-If you have not already installed Happstack -- you will need to do that first. You can find instructions on how to install Happstack at [http://happstack.com/page/view-page-slug/2/download](http://happstack.com/page/view-page-slug/2/download).
+If you are reading this on School of Haskell, you can run the examples interactively with out installing anything.
+
+If you want to run the code locally, and you have not already installed Happstack -- you will need to do that first. You can find instructions on how to install Happstack at [http://happstack.com/page/view-page-slug/2/download](http://happstack.com/page/view-page-slug/2/download).
 
 To build the application run:
 
@@ -77,7 +78,7 @@ official curl website is [http://curl.haxx.se](http://curl.haxx.se).
 The parts of `Hello World`
 -------------------------
 
-### Listening for HTTP requests
+%%% Listening for HTTP requests
 
 The `simpleHTTP` function is what actually starts the program listening for incoming HTTP requests:
 
@@ -87,7 +88,7 @@ simpleHTTP :: (ToMessage a) => Conf -> ServerPartT IO a -> IO ()
 
 We'll examine the various parts of this type signature in the following sections.
 
-### Configuring the HTTP listener
+%%% Configuring the HTTP listener
 
 The first argument is some simple server configuration information. It is defined as:
 
@@ -132,7 +133,7 @@ nullConf = Conf
     }
 ~~~~
 
-### Processing a `Request`
+%%% Processing a `Request`
 
 The second argument is a bit more interesting. It is the handler which processes an incoming HTTP `Request` and generates a `Response`. `ServerPartT IO a` is essentially a fancy way of writing a function with the type:
 
@@ -142,7 +143,7 @@ Request -> IO a
 
 `simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return the `Response` to the client. When developing your handler, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
 
-### Setting the HTTP response code
+%%% Setting the HTTP response code
 
 In this example, our handler is simply:
 
@@ -160,7 +161,7 @@ ok :: a -> ServerPartT IO a
 
 `Happstack.Server.SimpleHTTP` contains similar functions for the common HTTP response codes including, `notFound`, `seeOther`, `badRequest` and more.
 
-### Creating a `Response`
+%%% Creating a `Response`
 
 The `ToMessage` class is used to turn values of different types into HTTP responses. It contains three methods:
 
@@ -177,10 +178,14 @@ A vast majority of the time we only call the `toResponse` method.
 
 Often times we will opt to explicitly call `toResponse`. For example:
 
-~~~~ {.haskell}
+~~~ {.haskell .active .web}
+-- / show
+module Main where
+
+import Happstack.Server (nullConf, simpleHTTP, toResponse, ok)
+-- show
 main :: IO ()
 main = simpleHTTP nullConf $ ok (toResponse "Hello, World!")
-~~~~
+~~~
 
 Happstack comes with pre-defined `ToMessage` instances for many types such as `Text.Html.Html`, `Text.XHtml.Html`, `String`, the types from HSP, and more.
-

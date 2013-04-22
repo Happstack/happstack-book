@@ -10,6 +10,7 @@ method :: (ServerMonad m, MonadPlus m, MatchMethod method) => method -> m ()
 
 Here is a simple demo app:
 
+
 > module Main where
 >
 > import Control.Monad (msum)
@@ -24,9 +25,6 @@ Here is a simple demo app:
 >        , dir "foo" $ do method GET
 >                         ok $ "You did a GET request on /foo\n"
 >        ]
->
-
-Source code for the app is [here](http://srclink/Method.hs).
 
 Using `curl` we can see the expected results for normal `GET` and `POST` requests to `/`:
 

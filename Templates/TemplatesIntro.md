@@ -39,7 +39,7 @@ Each templating system has it's own set of advantages and drawbacks.
       <li>Type-checked at compile time to ensure types are correct and no template values are missing</li>
       <li>Automatic escaping of String values</li>
       <li>Syntax is very similar to XML/HTML, so it is easy to learn</li>
-      <li>Can be easier to work with when trying to populate a template from a complex Haskell type     
+      <li>Can be easier to work with when trying to populate a template from a complex Haskell type</li>
       <li>Can be used to generate HTML or XML</li>
      </ul>
     cons:

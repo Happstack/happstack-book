@@ -16,17 +16,15 @@ msum :: (MonadPlus m) => [m a] -> m a
 In the following example we combine three `ServerPartT`s together.
 
 > module Main where
->
+
 > import Control.Monad
 > import Happstack.Server (nullConf, simpleHTTP, ok, dir)
->
+
 > main :: IO ()
 > main = simpleHTTP nullConf $ msum [ mzero
 >                                   , ok "Hello, World!"
 >                                   , ok "Unreachable ServerPartT"
 >                                   ]
-
-Source code for the app is [here.](http://srclink/MonadPlus.hs)
 
 The behaviour of `MonadPlus` is to try each `ServerPartT` in succession,
 until one succeeds.
