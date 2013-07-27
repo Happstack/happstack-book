@@ -1,9 +1,11 @@
-#!/usr/bin/runhaskell
 module Main where
 
-import Control.Applicative ((<$>))
+import Control.Applicative        ((<$>))
+import Control.Monad              ((<=<))
+import Data.List                  (intersperse)
 import Development.Shake
 import Development.Shake.FilePath
+import SoHFilter (sohFilter)
 
 chapters :: [FilePath]
 chapters = [ "title.txt"
@@ -58,27 +60,32 @@ chapters = [ "title.txt"
 -}
            ]
 
-allChapters = "_build/allChapters.md"
+this           = "make2.hs"
+allChapters    = "_build/allChapters.md"
+allChaptersSoH = "_build/allChaptersSoH.md"
 
 main :: IO ()
 main = shake shakeOptions $ do
          want ["_build/book.html", "_build/book.pdf", "_build/book.md"]
          allChapters *> \out ->
-             do need ("make" : chapters )
-                allChaptersTxt <- concat <$> mapM readFile' chapters
+             do need (this : chapters)
+                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM readFile' chapters
                 writeFileChanged allChapters allChaptersTxt
                 system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", allChapters]
                 system' "sed" ["-i", "s/%%%/\\#\\#\\#/", allChapters]
          "_build/book.html" *> \out ->
-             do need ["make",  allChapters]
+             do need [this,  allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
          "_build/book.pdf" *> \out ->
-             do need ["make", allChapters]
+             do need [this, allChapters]
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
          "_build/book.md" *> \out ->
-             do need ["make",  allChapters]
-                let allChapters_ = (allChapters++"_")
-                system' "cp" [allChapters, allChapters_]
-                system' "sed" ["-i", "s/import Happstack.Server/import Happstack.Server.Env/", allChapters_]
-                system' "pandoc" ["-f", "markdown+lhs","-t","markdown_soh","-o", out, allChapters_]
+             do need (this:"SoHFilter.hs":chapters)
+                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM (sohFilter <=< readFile') chapters
+                writeFileChanged out allChaptersTxt
+                system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", out]
+                system' "sed" ["-i", "s/%%%/\\#\\#\\#/", out]
+                system' "sed" ["-i", "s/import Happstack.Server/import Happstack.Server.Env/", out]
                 system' "sed" ["-i", "s/sourceCode literate haskell/haskell web active/", out]
+--                system' "pandoc" ["-f", "markdown+lhs","-t","markdown_soh","-o", out, allChapters_]
+
