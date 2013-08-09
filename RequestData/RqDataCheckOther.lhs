@@ -20,23 +20,26 @@ within range:
 > module Main where
 >
 > import Control.Applicative ((<$>), (<*>))
-> import Happstack.Server (ServerPart, badRequest, nullConf, ok, simpleHTTP)
-> import Happstack.Server.RqData (RqData, checkRq, getDataFn, look, lookRead)
+> import Happstack.Server
+>     (ServerPart, badRequest, nullConf, ok, simpleHTTP)
+> import Happstack.Server.RqData
+>     (RqData, checkRq, getDataFn, look, lookRead)
 >
 > inRange :: (Show a, Ord a) => a -> a -> a -> Either String a
 > inRange lower upper a
 >     | lower <= a && a <= upper = Right a
 >     | otherwise =
->         Left (show a ++ " is not between " ++ show lower ++ " and " ++ show upper)
+>         Left (show a ++ " is not between " ++
+>               show lower ++ " and " ++ show upper)
 >
 > oneToTenPart :: ServerPart String
-> oneToTenPart =
->     do r <- getDataFn (lookRead "i" `checkRq` (inRange (1 :: Int) 10))
->        case r of
->          (Left e) ->
->              badRequest $ unlines e
->          (Right i) ->
->              ok $ "You picked: " ++ show i
+> oneToTenPart = do
+>   r <- getDataFn (lookRead "i" `checkRq`(inRange (1 :: Int) 10))
+>   case r of
+>     (Left e) ->
+>         badRequest $ unlines e
+>     (Right i) ->
+>         ok $ "You picked: " ++ show i
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ oneToTenPart
@@ -44,7 +47,7 @@ within range:
 
 Source code for the app is [here](http://srclink/RqDataCheckOther.hs).
 
-Now if we visit ]http://localhost:8000/?i=10](http://localhost:8000/?i=10), we will get the message:
+Now if we visit [http://localhost:8000/?i=10](http://localhost:8000/?i=10), we will get the message:
 
 
      $ curl http://localhost:8000/?i=10

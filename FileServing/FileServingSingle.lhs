@@ -13,10 +13,16 @@ Clearly, we can not just map the path info portion of the URL to a file disk, be
 
 
 ~~~~ {.haskell}
-serveFile :: (ServerMonad m, FilterMonad Response m, MonadIO m, MonadPlus m) =>
-             (FilePath -> m String)   -- ^ function for determining content-type of file.
-                                      --   Usually 'asContentType' or 'guessContentTypeM'
-          -> FilePath                 -- ^ path to the file to serve
+serveFile :: ( ServerMonad m
+             , FilterMonad Response m
+             , MonadIO m
+             , MonadPlus m
+             ) =>
+             (FilePath -> m String) -- ^ function for determining
+                                    --   content-type of file.
+                                    --   Usually 'asContentType'
+                                    --   or 'guessContentTypeM'
+          -> FilePath               -- ^ path to the file to serve
           -> m Response
 ~~~~
 
@@ -25,7 +31,7 @@ The first argument is a function which calculates the mime-type for a `FilePath`
 
 
 ~~~~ {.haskell}
-serveFile (guessContentTypeM mimeTypes) "/path/to/photos/photo_medium.jpg"
+serveFile (guessContentTypeM mimeTypes) "/srv/photos/photo.jpg"
 ~~~~
 
 
@@ -35,7 +41,7 @@ Note that even though the file is named `photo_medium.jpg` on the disk, that nam
 
 
 ~~~~ {.haskell}
-serveFile (asContentType "image/jpeg") "/path/to/photos/photo_medium.jpg"
+serveFile (asContentType "image/jpeg") "/srv/photos/photo.jpg"
 ~~~~
 
 
@@ -44,11 +50,13 @@ The following, example attempts to serve its own source code for any incoming re
 
 > module Main where
 >
-> import Happstack.Server (asContentType, nullConf, serveFile, simpleHTTP)
+> import Happstack.Server ( asContentType, nullConf
+>                          , serveFile, simpleHTTP)
 >
 > main :: IO ()
 > main =
->  simpleHTTP nullConf $ serveFile (asContentType "text/x-haskell") "FileServingSingle.hs"
+>  simpleHTTP nullConf $
+>   serveFile (asContentType "text/x-haskell") "FileServingSingle.hs"
 
 Source code for the app is [here](http://srclink/FileServingSingle.hs).
 

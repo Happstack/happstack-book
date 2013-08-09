@@ -34,8 +34,8 @@ As usual, we start off with a bunch of imports and pragmas:
 
 
 > {-# LANGUAGE FlexibleContexts, FlexibleInstances, TemplateHaskell,
->     MultiParamTypeClasses, OverloadedStrings #-}
-> {-# OPTIONS_GHC -F -pgmFtrhsx #-}
+>     MultiParamTypeClasses, OverloadedStrings, QuasiQuotes,
+>     TypeFamilies #-}
 > module Main where
 >
 > import Control.Applicative   ((<$>))
@@ -44,16 +44,22 @@ As usual, we start off with a bunch of imports and pragmas:
 > import Control.Monad.Trans   (MonadIO(liftIO))
 > import Data.Map              (Map, fromList)
 > import qualified Data.Map    as Map
-> import           Data.Text   (Text)
-> import qualified Data.Text   as Text
-> import Happstack.Server      ( ServerPart, ServerPartT, dir, lookTexts', mapServerPartT
->                              , nullConf, nullDir, queryString, simpleHTTP
->                              , acceptLanguage, bestLanguage
+> import Data.Monoid           ((<>))
+> import qualified Data.Text   as Strict
+> import qualified Data.Text.Lazy as Lazy
+> import Happstack.Server      ( ServerPart, ServerPartT, dir
+>                              , lookTexts', mapServerPartT
+>                              , nullConf, nullDir, queryString
+>                              , simpleHTTP , acceptLanguage
+>                              , bestLanguage
 >                              )
 > import Happstack.Server.HSP.HTML
-> import qualified HSX.XMLGenerator as HSX
-> import Text.Shakespeare.I18N ( RenderMessage(..), Lang, mkMessage, mkMessageFor
->                              , mkMessageVariant)
+> import Happstack.Server.XMLGenT
+> import HSP
+> import HSP.Monad             (HSPT(..))
+> import Language.Haskell.HSX.QQ (hsx)
+> import Text.Shakespeare.I18N ( RenderMessage(..), Lang, mkMessage
+>                              , mkMessageFor, mkMessageVariant)
 > import System.Random (randomRIO)
 >
 
@@ -70,21 +76,21 @@ define the type:
 
 Then we could provide a translation function for each language we support:
 
-> translation_en :: Message -> Text
-> translation_en Hello       = Text.pack "hello"
+> translation_en :: Message -> Strict.Text
+> translation_en Hello       = "hello"
 > translation_en Goodbye     = "goodbye"
 >
-> translation_lojban :: Message -> Text
+> translation_lojban :: Message -> Strict.Text
 > translation_lojban Hello   = "coi"
 > translation_lojban Goodbye = "co'o"
 >
-> translations :: Map Text (Message -> Text)
+> translations :: Map Strict.Text (Message -> Strict.Text)
 > translations =
 >     fromList [ ("en"    , translation_en)
 >              , ("lojban", translation_lojban)
 >              ]
 >
-> translate :: Text -> Message -> Text
+> translate :: Strict.Text -> Message -> Strict.Text
 > translate lang msg =
 >     case Map.lookup lang translations of
 >       Nothing           -> "missing translation"
@@ -94,8 +100,12 @@ Then we could provide a translation function for each language we support:
 
 and then in our templates we can write:
 
-> helloPage :: (XMLGenerator m, EmbedAsChild m Text) => Text -> XMLGenT m (HSX.XML m)
-> helloPage lang =
+> helloPage :: ( XMLGenerator m
+>               , EmbedAsChild m Strict.Text
+>               , StringType m ~ Lazy.Text
+>               ) =>
+>              Strict.Text -> XMLGenT m (XMLType m)
+> helloPage lang = [hsx|
 >     <html>
 >      <head>
 >       <title><% translate lang Hello %></title>
@@ -104,7 +114,7 @@ and then in our templates we can write:
 >       <p><% translate lang Hello %></p>
 >      </body>
 >     </html>
->
+>     |]
 
 The principle behind this approach is nice, but in practice, it has a few problems:
 
@@ -128,7 +138,8 @@ type Lang = Text
 
 class RenderMessage master message where
   renderMessage :: master    -- ^ translation variant
-                -> [Lang]    -- ^ desired languages in descending order of preference
+                -> [Lang]    -- ^ desired languages in descending
+                             --   order of preference
                 -> message   -- ^ message we want translated
                 -> Text      -- ^ best matching translation
 ~~~~
@@ -162,6 +173,7 @@ data AppI18N = AppI18N
 
 instance RenderMessage AppI18N Message where
     renderMessage = ...
+~~~~
 
 `shakespeare-i18n` translation files
 ------------------------------------
@@ -174,8 +186,13 @@ translation files.
 To keep things simple:
 
  1. each language will have its own translation file
- 2. the file will be named _lang_`.msg` where `lang` is a language code such as `en`, `en-GB`, `fr`, etc
- 3. the translation files will all be in a subdirectory which contains nothing but translations
+
+ 2. the file will be named _lang_`.msg` where `lang` is a language code
+    such as `en`, `en-GB`, `fr`, etc
+
+ 3. the translation files will all be in a subdirectory which contains
+    nothing but translations
+
  4. the `.msg` files must be UTF-8 encoded
 
 So for this example we will have three files:
@@ -252,9 +269,10 @@ Due to TH staging restrictions this code must come before the `mkMessage` call b
 >
 > mkMessageFor "DemoApp" "Thing" "messages/thing" ("en")
 >
-> thing_tr :: Lang -> Thing -> Text
+> thing_tr :: Lang -> Thing -> Strict.Text
 > thing_tr lang thing = renderMessage DemoApp [lang] thing
 >
+
 \#endif
 -->
 
@@ -496,7 +514,7 @@ The instance will need to know what the client's preferred languages
 are. We can provide that by putting the users language preferences in
 a `ReaderT` monad:
 
-> type I18N  = ServerPartT (ReaderT [Lang] IO)
+> type I18N  = HSPT XML (ServerPartT (ReaderT [Lang] IO))
 >
 
 Next we create the `EmbedAsChild` instance:
@@ -504,39 +522,40 @@ Next we create the `EmbedAsChild` instance:
 > instance EmbedAsChild I18N DemoAppMessage where
 >     asChild msg =
 >         do lang <- ask
->            asChild $ renderMessage DemoApp lang msg
+>            asChild $ Lazy.fromStrict $ renderMessage DemoApp lang msg
 >
 
 Now we can use the message constructors inside our templates:
 
-> pageTemplate :: (EmbedAsChild I18N body) => String -> body -> I18N XML
+> pageTemplate :: (EmbedAsChild I18N body) =>
+>                 Lazy.Text -> body -> I18N XML
 > pageTemplate title body =
->     defaultTemplate title ()
+>     defaultTemplate title () [hsx|
 >      <div>
 >       <% body %>
 >       <ul>
 >        <% mapM (\lang ->
 >                  <li>
->                    <a [ ("href" :: String) := ("?_LANG="++ lang)]><% lang %></a>
+>                    <a [ "href" := ("?_LANG="<> lang) :: Attr Lazy.Text Lazy.Text]><% lang %></a>
 >                  </li>)
->               (["en", "en-GB", "jbo"] :: [String]) %>
+>               (["en", "en-GB", "jbo"]) %>
 >       </ul>
->      </div>
+>      </div> |]
 >
 > homePage :: I18N XML
 > homePage =
 >    pageTemplate "home"
->        <p><% MsgHello %></p>
+>        [hsx| <p><% MsgHello %></p> |]
 >
 > goodbyePage :: I18N XML
 > goodbyePage =
 >     pageTemplate "goodbye"
->         <p><% MsgGoodbye %></p>
+>         [hsx| <p><% MsgGoodbye %></p> |]
 >
 > problemsPage :: Int -> Thing -> I18N XML
 > problemsPage n thing =
 >     pageTemplate "problems"
->         <p><% MsgProblems n thing %></p>
+>         [hsx| <p><% MsgProblems n thing %></p> |]
 >
 
 Instead of putting text in the `<p> </p>` tags we just use our message constructors.
@@ -561,7 +580,7 @@ We can wrap this all up in a little function that converts our `I18N` part into 
 > withI18N part =
 >     do  langsOverride <- queryString $ lookTexts' "_LANG"
 >         langs         <- bestLanguage <$> acceptLanguage
->         mapServerPartT (flip runReaderT (langsOverride ++ langs)) part
+>         mapServerPartT (flip runReaderT (langsOverride ++ langs)) (unHSPT part)
 >
 
 And finally, we just have our `route` table and `main` function:

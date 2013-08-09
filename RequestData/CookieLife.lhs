@@ -6,11 +6,11 @@ When you set a cookie, you also specify the lifetime of that cookie. Cookies are
 
 session cookie
 
-:  A cookie which expires when the browser is closed.
+:    A cookie which expires when the browser is closed.
 
 permanent cookie
 
-:  A cookie which is saved (to disk) and is available even if the browser is restarted. The expiration time is set by the server.
+:    A cookie which is saved (to disk) and is available even if the browser is restarted. The expiration time is set by the server.
 
 The lifetime of a `Cookie` is specified using the `CookieLife` type:
 
@@ -18,7 +18,8 @@ The lifetime of a `Cookie` is specified using the `CookieLife` type:
 -- | the lifetime of the cookie
 data CookieLife
   = Session          -- ^ expire when the browser is closed
-  | MaxAge Seconds   -- ^ expire after the specified number of seconds
+  | MaxAge Seconds   -- ^ expire after the specified
+                     --   number of seconds
   | Expires UTCTime  -- ^ expire at a specific date and time
   | Expired          -- ^ expire immediately
 ~~~~

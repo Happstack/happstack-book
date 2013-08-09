@@ -13,5 +13,3 @@ When the server sends a `Response` to the client, it can include a special `Resp
 
 The next time the client talks to the server, it will include a copy of the `Cookie` value in its `Request` headers. One possible use of cookies is to store a session id. When the client submits the cookie, the server can use the session id to look up information about the client and <i>remember</i> who they are. Sessions and session ids are not built-in to the HTTP specification. They are merely a common idiom which is provided by many web frameworks.
 
-\#include "CookieFeatures.lhs"
-

@@ -43,8 +43,8 @@ srcFixups (Pandoc meta blocks) =
     where
       addSrcChunk :: Block -> (String, Bool) -> (String, Bool)
       addSrcChunk (CodeBlock (_,cls,_) code) (code', sgh)
-          | "literate" `elem` cls         = (code' ++ code, sgh)
-          | "source-goes-here" `elem` cls = (code' ++ code, True)
+          | "literate" `elem` cls         = (code ++ code', sgh)
+          | "source-goes-here" `elem` cls = (code ++ code', True)
       addSrcChunk _ a = a
 
       addCompleteSrc :: String -> Block -> [Block]

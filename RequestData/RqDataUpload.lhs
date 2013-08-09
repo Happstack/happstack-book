@@ -12,9 +12,9 @@ lookFile :: String -> RqData (FilePath, FilePath, ContentType)
 
 It returns three values:
 
- 1. The location of the temporary file which holds the contents of the file<
- 2. The <i>local</i> filename supplied by the browser. This is typically the name of the file on the users system.
- 3. The content-type of the file (as supplied by the browser)
+ 1. The location of the temporary file which holds the contents of the file
+ 2. The *local* filename supplied by the browser. This is typically the name of the file on the users system.
+ 3. The `content-type` of the file (as supplied by the browser)
 
 The temporary file will be automatically deleted after the `Response`
 is sent. Therefore, it is essential that you move the file from the
@@ -36,14 +36,15 @@ understand something, try looking in earlier material.
 
 
 > {-# LANGUAGE OverloadedStrings #-}
-> import Control.Monad                      (msum)
-> import Happstack.Server                   ( Response, ServerPart, defaultBodyPolicy
->                                           , decodeBody, dir, lookFile, nullConf, ok
->                                           , simpleHTTP, toResponse )
+> import Control.Monad    (msum)
+> import Happstack.Server
+>     ( Response, ServerPart, defaultBodyPolicy
+>     , decodeBody, dir, lookFile, nullConf, ok
+>     , simpleHTTP, toResponse )
 > import Text.Blaze                         as B
 > import Text.Blaze.Html4.Strict            as B hiding (map)
 > import Text.Blaze.Html4.Strict.Attributes as B hiding (dir, title)
->
+
 > main :: IO ()
 > main = simpleHTTP nullConf $ upload
 >
@@ -60,9 +61,11 @@ understand something, try looking in earlier material.
 >       B.head $ do
 >         title "Upload Form"
 >       B.body $ do
->         form ! enctype "multipart/form-data" ! B.method "POST" ! action "/post" $ do
->              input ! type_ "file" ! name "file_upload" ! size "40"
->              input ! type_ "submit" ! value "upload"
+>         form ! enctype "multipart/form-data"
+>              ! B.method "POST"
+>              ! action "/post" $ do
+>                input ! type_ "file" ! name "file_upload" ! size "40"
+>                input ! type_ "submit" ! value "upload"
 >
 > post :: ServerPart Response
 > post =
@@ -74,9 +77,9 @@ understand something, try looking in earlier material.
 >            B.body $ mkBody r
 >     where
 >       mkBody (tmpFile, uploadName, contentType) = do
->                 p (toHtml $ "temporary file: " ++ tmpFile)
->                 p (toHtml $ "uploaded name:  " ++ uploadName)
->                 p (toHtml $ "content-type:   " ++ show contentType)
+>         p (toHtml $ "temporary file: " ++ tmpFile)
+>         p (toHtml $ "uploaded name:  " ++ uploadName)
+>         p (toHtml $ "content-type:   " ++ show contentType)
 
 Source code for the app is [here](http://srclink/RqDataUpload.hs).
 

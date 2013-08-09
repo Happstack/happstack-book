@@ -2,37 +2,37 @@
 JavaScript via JMacro
 =====================
 
-To use JMacro with happstack and hsx, you should install the `hsx-jmacro` and `happstack-jmacro` packages.
+To use `JMacro` with `happstack` and `hsx`, you should install the `hsx-jmacro` and `happstack-jmacro` packages.
 
 [JMacro](http://www.haskell.org/haskellwiki/Jmacro) is a library that makes it easy to include javascript in your templates.
 
-The syntax used by JMacro is almost identical to JavaScript. So, you
-do not have to learn some special DSL to use it. In fact, JMacro can
-work with most JavaScript you find in the wild. Using JMacro has a
-number of advantages over just using plain-old javascript.
+The syntax used by `JMacro` is almost identical to `JavaScript`. So, you
+do not have to learn some special DSL to use it. In fact, `JMacro` can
+work with most `JavaScript` you find in the wild. Using `JMacro` has a
+number of advantages over just using plain-old `JavaScript`.
 
- * syntax checking ensures that your JavaScript is syntactically valid
-   at compile time. That eliminates many common JavaScript errors and
+ * syntax checking ensures that your `JavaScript` is syntactically valid
+   at compile time. That eliminates many common `JavaScript` errors and
    reduces development time.
 
  * hygienic names and scoping automatically and transparently ensure
-   that blocks of JavaScript code do not accidentally create variables
+   that blocks of `JavaScript` code do not accidentally create variables
    and functions with conflicting names.
 
  * Antiquotation, marshalling, and shared scope make it easy to splice
-   Haskell values into the JavaScript code. It also makes it easy to
-   programmatically generate JavaScript code.
+   Haskell values into the `JavaScript` code. It also makes it easy to
+   programmatically generate `JavaScript` code.
 
-The `hsx-jmacro` and `happstack-jmacro` libraries makes it easy to use JMacro with <a href="http://www.happstack.com/">Happstack</a> and HSP.
+The `hsx-jmacro` and `happstack-jmacro` libraries makes it easy to use JMacro with <a href="http://www.happstack.com/">Happstack</a> and `HSP`.
 
-The following examples demonstrate the basics of JMacro and how it
-interfaces with HSX and Happstack. The examples are intended to
-demonstrate what is possible with JMacro. The examples are not
-intended to demonstrate good javascript practices. For example, many
+The following examples demonstrate the basics of `JMacro` and how it
+interfaces with `HSP` and `Happstack`. The examples are intended to
+demonstrate what is possible with `JMacro`. The examples are not
+intended to demonstrate good `JavaScript` practices. For example, many
 developers frown on the use of the `onclick` attribute in html, or
 having `<script>` tags in the `<body>`.
 
-The JMacro library does not require any external
+The `JMacro` library does not require any external
 pre-processors. Instead it uses the magic of
 [QuasiQuotation](http://haskell.org/haskellwiki/Quasiquotation).
 
@@ -41,16 +41,12 @@ pre-processors. Instead it uses the magic of
 > {-# LANGUAGE CPP, FlexibleInstances, GeneralizedNewtypeDeriving,
 >     TypeSynonymInstances, QuasiQuotes #-}
 
-In this example we are also using HSX, which does require a
-pre-processor. (A crash course section on HSX itself will be coming
-soon). The following line will automatically run the pre-processor for
-us (and also suppress warnings about orphan instances):
+At this time it is not possible to nest the `JMacro` quasiquoter inside the `hsx` quasiquoter. However, we can work around this by using the `hsx2hs` preprocessor:
 
+> {-# OPTIONS_GHC -F -pgmFhsx2hs #-}
 
-> {-# OPTIONS_GHC -F -pgmFtrhsx -fno-warn-orphans #-}
-
-
-Next we have a boatload of imports. Not all of these are required to use JMacro. Many are just used for the demos.
+Next we have a boatload of imports. Not all of these are required to
+use `JMacro`. Many are just used for the demos.
 
 There is one really import thing to note though. If you look at the
 import for `Language.Javascript.JMacro`, you will find that there are
@@ -68,22 +64,25 @@ you use explicit import lists. Alternatively, you can just import
 > import Control.Monad.Trans (liftIO)
 > import qualified Data.Map  as Map
 > import Data.Maybe          (fromMaybe)
-> import Happstack.Server    (Response, ServerPartT, dir, mapServerPartT, look, nullConf,
->                             ok, simpleHTTP, toResponse)
-> import Happstack.Server.HSP.HTML  (defaultTemplate) -- ^ also imports 'ToMessage XML'
-> import Happstack.Server.JMacro    (jmResponse)      -- ^ ToMessage instance for JStat
-> import HSP                        ( Attr(..), EmbedAsAttr(..), EmbedAsChild(..)
->                                   , genElement, genEElement
->                                   )
-> import HSP.ServerPartT            () -- ^ instance 'XMLGenerator ServerPartT'
-> import HSX.JMacro                 ( IntegerSupply(..)
->                                   , nextInteger') -- EmbedAsChild & EmbedAsAttr for JStat
-> import Language.Javascript.JMacro ( ToJExpr(..), Ident(..), JStat(..), JExpr(..)
->                                   , JVal(..), jmacro, jsv, jLam, jVarTy)
+> import Data.String         (fromString)
+> import Happstack.Server    ( Response, ServerPartT, dir
+>                            , mapServerPartT, look
+>                            , nullConf, ok, simpleHTTP
+>                            , toResponse)
+> import Happstack.Server.HSP.HTML  (defaultTemplate)
+> import Happstack.Server.JMacro    (jmResponse)
+> import HSP
+> import HSP.Monad                  (HSPT(..))
+> import Happstack.Server.XMLGenT   () -- Happstack instances
+>                                      -- for XMLGenT and HSPT
+> import HSP.JMacro                 ( IntegerSupply(..)
+>                                   , nextInteger')
+> import Language.Javascript.JMacro ( ToJExpr(..), Ident(..)
+>                                   , JStat(..), JExpr(..)
+>                                   , JVal(..), jmacro, jsv
+>                                   , jLam, jVarTy)
 > import System.Random              (Random(..))
 >
-
-
 
 In order to ensure that each `<script>` tag generates unique variables
 names, we need a source of unique prefixes. An easy way to do that is to
@@ -91,10 +90,10 @@ wrap the `ServerPartT` monad around a `StateT` monad that supplies
 integers:
 
 
-> type JMacroPart = ServerPartT (StateT Integer IO)
+> type JMacroPart = HSPT XML (ServerPartT (StateT Integer IO))
 >
 > instance IntegerSupply JMacroPart where
->     nextInteger = nextInteger'
+>   nextInteger = nextInteger'
 >
 
 
@@ -112,7 +111,7 @@ To use JMacroPart with `simpleHTTP`, we just evaluate the `StateT` monad:
 > main = simpleHTTP nullConf $ flatten handlers
 >     where
 >       flatten :: JMacroPart a -> ServerPartT IO a
->       flatten = mapServerPartT (flip evalStateT 0)
+>       flatten = mapServerPartT (flip evalStateT 0) . unHSPT
 >
 
 
@@ -125,19 +124,20 @@ In this example we embed a single JavaScript block inside the page:
 
 > helloJMacro :: JMacroPart Response
 > helloJMacro =
->     toResponse <$> defaultTemplate "Hello JMacro" ()
->       <div>
->        <% [$jmacro|
->            var helloNode = document.createElement('h1');
->            helloNode.appendChild(document.createTextNode("Hello, JMacro!"));
->            document.body.appendChild(helloNode);
->            |] %>
+>   toResponse <$> defaultTemplate (fromString "Hello JMacro") ()
+>     <div>
+>      <% [jmacro|
+>       var helloNode = document.createElement('h1');
+>       helloNode.appendChild(document.createTextNode("Hello, JMacro!"));
+>       document.body.appendChild(helloNode);
+>       |] %>
+>     </div>
 >
 >
 
 We do not need to specify the `&lt;script&gt;` tag explicitly, it will automatically be created for us.
 
-The syntax `[$jmacro| ... |]` is the magic incantation for running the
+The syntax `[jmacro| ... |]` is the magic incantation for running the
 `jmacro` quasiquoter. In GHC 7.x, the $ is no longer required, so in
 theory you could write, `[jmacro| ... |]`. However, HSX has not been updated to support the $ free syntax. So, for now you will need to stick with the $ syntax, despite the compiler warnings saying, `Warning: Deprecated syntax: quasiquotes no longer need a dollar sign: $jmacro`.
 
@@ -148,8 +148,9 @@ We can also use JMacro inside html attributes, such as `onclick`.
 
 > helloAttr :: JMacroPart Response
 > helloAttr =
->  toResponse <$> defaultTemplate "Hello Attr" ()
->  <h1 style="cursor:pointer" onclick=[$jmacro| alert("that </tickles>!") |]>Click me!</h1>
+>  toResponse <$> defaultTemplate (fromString "Hello Attr") ()
+>  <h1 style="cursor:pointer"
+>      onclick=[jmacro| alert("that </tickles>!") |] >Click me!</h1>
 >
 
 
@@ -168,16 +169,18 @@ string literals. So we can just write this:
 
 > helloEndTag :: JMacroPart Response
 > helloEndTag =
->     toResponse <$> defaultTemplate "Hello End Tag" ()
+>     toResponse <$> defaultTemplate (fromString "Hello End Tag") ()
 >     <%>
 >      <h1>Tricky End Tag</h1>
->      <% [$jmacro| alert("this </script> won't mess things up!") |] %>
+>      <% [jmacro| alert("this </script> won't mess things up!") |] %>
 >     </%>
 >
 
 And it will generate:
 
-    <script type="text/javascript">alert("this <\/script>; won't mess things up!");</script>
+    <script type="text/javascript">
+     alert("this <\/script>; won't mess things up!");
+    </script>
 
 
 Hygienic Variable Names
@@ -193,16 +196,17 @@ the following block of JavaScript code:
 
 > clickMe :: JStat
 > clickMe =
->     [$jmacro|
+>     [jmacro|
 >
 >     var clickNode = document.createElement('p');
 >     clickNode.appendChild(document.createTextNode("Click me!"));
 >     document.body.appendChild(clickNode);
 >     var clickCnt = 0;
 >     clickNode.setAttribute('style', 'cursor: pointer');
->     clickNode.onclick = function () { clickCnt++;
->                                       alert ('Been clicked ' + clickCnt + ' time(s).');
->                                     };
+>     clickNode.onclick = function () {
+>        clickCnt++;
+>        alert ('Been clicked ' + clickCnt + ' time(s).');
+>       };
 >     |]
 >
 
@@ -221,11 +225,12 @@ counts separately:
 
 > clickPart :: JMacroPart Response
 > clickPart =
->     toResponse <$> defaultTemplate "Hygienic Naming" ()
+>     toResponse <$> defaultTemplate (fromString "Hygienic Naming") ()
 >                    <div>
 >                     <h1>A Demo of Happstack+HSP+JMacro</h1>
 >                     <% clickMe %>
 >                     <% clickMe %>
+>                    </div>
 >
 
 
@@ -249,30 +254,31 @@ The use of ! when declaring a variable disables hygienic naming. Now all the cop
 
 > clickMe2Init :: JStat
 > clickMe2Init =
->     [$jmacro| var !clickCnt = 0; |];
+>     [jmacro| var !clickCnt = 0; |];
 >
 > clickMe2 :: JStat
 > clickMe2 =
->     [$jmacro|
+>     [jmacro|
 >
 >     var clickNode = document.createElement('p');
 >     clickNode.appendChild(document.createTextNode("Click me!"));
 >     document.body.appendChild(clickNode);
 >     clickNode.setAttribute("style", "cursor: pointer");
->     clickNode.onclick = function () { clickCnt++;
->                                       alert ('Been clicked ' + clickCnt + ' time(s).');
->                                     };
+>     clickNode.onclick = function () {
+>       clickCnt++;
+>       alert ('Been clicked ' + clickCnt + ' time(s).');
+>      };
 >     |]
 >
 > clickPart2 :: JMacroPart Response
 > clickPart2 =
->     toResponse <$> defaultTemplate "Hygienic Naming"
+>     toResponse <$> defaultTemplate (fromString "Hygienic Naming")
 >                    <% clickMe2Init %>
 >                    <div>
 >                     <h1>A Demo of Happstack+HSP+JMacro</h1>
 >                     <% clickMe2 %>
 >                     <% clickMe2 %>
->
+>                    </div>
 >
 
 Declaring Functions
@@ -305,22 +311,31 @@ fun goodbyeAgain noun -> alert('goodbye again, ' + noun);
 
 Here they all are in an example:
 
+>
 > functionNames :: JMacroPart Response
 > functionNames =
->     toResponse <$> defaultTemplate "Function Names"
->           <% [$jmacro|
->                function !hello(noun) { alert('hello, ' + noun); }
->                var !helloAgain = \noun ->alert('hello again, ' + noun);
->                fun goodbye noun { alert('goodbye ' + noun); }
->                fun goodbyeAgain noun -> alert('goodbye again, ' + noun);
->              |]
->            %>
->           <%>
->             <button onclick=[$jmacro| hello('world'); |]>hello</button>
->             <button onclick=[$jmacro| helloAgain('world'); |]>helloAgain</button>
->             <button onclick=[$jmacro| goodbye('world'); |]>goodbye</button>
->             <button onclick=[$jmacro| goodbyeAgain('world'); |]>goodbyeAgain</button>
->           </%>
+>     toResponse <$> defaultTemplate (fromString "Function Names")
+>       <% [jmacro|
+>            function !hello(noun) { alert('hello, ' + noun); }
+>            var !helloAgain = \noun ->alert('hello again, ' + noun);
+>            fun goodbye noun { alert('goodbye ' + noun); }
+>            fun goodbyeAgain noun -> alert('goodbye again, ' + noun);
+>          |]
+>        %>
+>       <%>
+>         <button onclick=[jmacro| hello('world'); |]>
+>           hello
+>         </button>
+>         <button onclick=[jmacro| helloAgain('world'); |]>
+>           helloAgain
+>         </button>
+>         <button onclick=[jmacro| goodbye('world'); |]>
+>           goodbye
+>         </button>
+>         <button onclick=[jmacro| goodbyeAgain('world'); |]>
+>           goodbyeAgain
+>         </button>
+>       </%>
 >
 
 Splicing Haskell Values into JavaScript (Antiquotation)
@@ -328,31 +343,35 @@ Splicing Haskell Values into JavaScript (Antiquotation)
 
 We can also splice Haskell values into the JavaScript code by using ``( )``. In the following example, the `onclick` action for the `<button>` calls `revealFortune()`. The argument to `revealForture` is the `String` returned by evaluating the Haskell expression `fortunes !! n`.
 
-> fortunePart :: JMacroPart Response
-> fortunePart =
->     do let fortunes =
->             ["You will be cursed to write Java for the rest of your days."
->             , "Fortune smiles upon you, your future will be filled with lambdas"
->             ]
->        n <- liftIO $ randomRIO (0, (length fortunes) - 1)
 >
->        toResponse <$> defaultTemplate "Fortune"
->               <% [$jmacro|
->                   fun revealFortune fortune
->                   {
->                    var b = document.getElementById("button");
->                    b.setAttribute('disabled', 'disabled');
->                    var p = document.getElementById("fortune");
->                    p.appendChild(document.createTextNode(fortune));
->                   }
->                  |]
->                   %>
->              <div>
->               <h1>Your Fortune</h1>
->               <p id="fortune">
->               <button id="button" onclick=[$jmacro| revealFortune(`(fortunes !! n)`); |]>
->                 Click to reveal your fortune
->               </button>
+> fortunePart :: JMacroPart Response
+> fortunePart = do
+>   let fortunes =
+>        ["You will be cursed to write Java for the rest of your days."
+>        , "Fortune smiles upon you, your future will be filled with lambdas."
+>        ]
+>   n <- liftIO $ randomRIO (0, (length fortunes) - 1)
+>
+>   toResponse <$> defaultTemplate (fromString "Fortune")
+>        <% [jmacro|
+>             fun revealFortune fortune
+>             {
+>              var b = document.getElementById("button");
+>              b.setAttribute('disabled', 'disabled');
+>              var p = document.getElementById("fortune");
+>              p.appendChild(document.createTextNode(fortune));
+>             }
+>            |]
+>        %>
+>        <div>
+>         <h1>Your Fortune</h1>
+>         <p id="fortune">
+>         <button id="button"
+>            onclick=[jmacro| revealFortune(`(fortunes !! n)`); |]>
+>           Click to reveal your fortune
+>         </button>
+>         </p>
+>        </div>
 >
 >
 
@@ -364,11 +383,12 @@ etc, by default. But we can also embed other types by creating a
 `ToJExpr` instance for them. For example, let's say we create some
 types for reporting the weather:
 
+>
 > data Skies = Cloudy | Clear
->            deriving (Bounded, Enum, Eq, Ord, Read, Show)
+>     deriving (Bounded, Enum, Eq, Ord, Read, Show)
 >
 > newtype Fahrenheit = Fahrenheit Double
->            deriving (Num, Enum, Eq, Ord, Read, Show, ToJExpr, Random)
+>     deriving (Num, Enum, Eq, Ord, Read, Show, ToJExpr, Random)
 >
 > data Weather = Weather
 >     { skies :: Skies
@@ -422,21 +442,25 @@ For the `Weather` type, we create a JavaScript object/hash/associative array/rec
 
 Now we can splice a random weather report into our JavaScript:
 
+
 > weatherPart :: JMacroPart Response
-> weatherPart =
->     do weather <- liftIO $ randomRIO ((Weather minBound (-40)), (Weather maxBound 100))
->        toResponse <$> defaultTemplate "Weather Report" ()
+> weatherPart = do
+>   weather <- liftIO $ randomRIO ((Weather minBound (-40)),
+>                                  (Weather maxBound 100))
+>   toResponse <$> defaultTemplate (fromString "Weather Report") ()
 >         <div>
->          <% [$jmacro|
+>          <% [jmacro|
 >              var w = `(weather)`;
 >              var p = document.createElement('p');
->              p.appendChild(document.createTextNode("The skies will be " + w.skies +
->                                                    " and the temperature will be " +
->                                                    w.temp.toFixed(1) + "F"));
+>              p.appendChild(document.createTextNode(
+>                 "The skies will be " + w.skies +
+>                 " and the temperature will be " +
+>                 w.temp.toFixed(1) + "F"));
 >              document.body.appendChild(p);
 >              |] %>
+>         </div>
 >
->
+
 
 `ToJExpr` has an instance for `JSValue` from the `json` library. So, if your type already has a `JSON` istance, you can trivially create a `ToJExpr` instance for it:
 
@@ -452,9 +476,10 @@ So far we have used JMacro to generate JavaScript that is embedded in HTML. We c
 
 First we have a script template that is parametrized by a greeting.
 
+
 > externalJs :: String -> JStat
 > externalJs greeting =
->     [$jmacro|
+>     [jmacro|
 >      window.greet = function (noun)
 >      {
 >        alert(`(greeting)` + ' ' + noun);
@@ -487,13 +512,18 @@ content-type, `text/javascript; charset=UTF-8`:
 
 Next we have an html page that includes the external script, and calls the `greet` function:
 
->          , toResponse <$> defaultTemplate "external"
->             <script type="text/javascript" src="/external/script.js?greeting=Ahoy" />
+>
+>          , toResponse <$> defaultTemplate (fromString "external")
+>             <script type="text/javascript"
+>                     src="/external/script.js?greeting=Ahoy" />
 >             <div>
 >              <h1>Greetings</h1>
->              <button onclick=[$jmacro| greet('JMacro'); |]>Click for a greeting.</button>
+>              <button onclick=[jmacro| greet('JMacro'); |]>
+>                Click for a greeting.
+>              </button>
 >             </div>
 >          ]
+>
 >
 
 
@@ -504,9 +534,10 @@ work-around is not needed. We do need to use `!` to make sure the name
 of the `greet2` function is not mangled though:
 
 
+>
 > externalJs2 :: String -> JStat
 > externalJs2 greeting =
->     [$jmacro|
+>     [jmacro|
 >      function !greet2 (noun)
 >      {
 >        alert(`(greeting)` + ' ' + noun);
@@ -520,34 +551,39 @@ of the `greet2` function is not mangled though:
 >           do greeting <- optional $ look "greeting"
 >              jmResponse $ externalJs2 (fromMaybe "hello" greeting)
 >
->     , toResponse <$> defaultTemplate "external 2"
->        <script type="text/javascript" src="/external2/script.js?greeting=Ahoy" />
+>     , toResponse <$> defaultTemplate (fromString "external 2")
+>        <script type="text/javascript"
+>                src="/external2/script.js?greeting=Ahoy" />
 >        <div>
 >         <h1>Greetings</h1>
->         <button onclick=[$jmacro| greet2('JMacro'); |]>Click for a greeting.</button>
+>         <button onclick=[jmacro| greet2('JMacro'); |]>
+>          Click for a greeting.
+>         </button>
 >        </div>
 >     ]
 >
+>
 
-<h3><a name="jmacro-demos">Links to demos</a></h3>
+%%% Links to demos
 
 Here is a little page that links to all the JMacro demos:
 
 > demosPart :: JMacroPart Response
 > demosPart =
->     toResponse <$> defaultTemplate "demos" ()
->                    <ul>
->                     <li><a href="/hello"    >Hello, JMacro</a></li>
->                     <li><a href="/attr"     >Hello, Attr</a></li>
->                     <li><a href="/endTag"   >Hello, End Tag</a></li>
->                     <li><a href="/clickMe"  >ClickMe</a></li>
->                     <li><a href="/clickMe2" >ClickMe2</a></li>
->                     <li><a href="/functions">Function Names</a></li>
->                     <li><a href="/fortune"  >Fortune</a></li>
->                     <li><a href="/weather"  >Weather</a></li>
->                     <li><a href="/external" >External</a></li>
->                     <li><a href="/external2" >External 2</a></li>
->                    </ul>
+>     toResponse <$>
+>       defaultTemplate (fromString "demos") ()
+>         <ul>
+>          <li><a href="/hello"    >Hello, JMacro</a></li>
+>          <li><a href="/attr"     >Hello, Attr</a></li>
+>          <li><a href="/endTag"   >Hello, End Tag</a></li>
+>          <li><a href="/clickMe"  >ClickMe</a></li>
+>          <li><a href="/clickMe2" >ClickMe2</a></li>
+>          <li><a href="/functions">Function Names</a></li>
+>          <li><a href="/fortune"  >Fortune</a></li>
+>          <li><a href="/weather"  >Weather</a></li>
+>          <li><a href="/external" >External</a></li>
+>          <li><a href="/external2" >External 2</a></li>
+>         </ul>
 >
 
 and our routes:
@@ -579,8 +615,9 @@ generate names, there are other options. For example, we could use
 `Data.Unique` to generate unique names:
 
 ~~~~ {.haskell}
-instance IntegerSupply (ServerPartT IO) where
-    nextInteger = fmap (fromIntegral . (`mod` 1024) . hashUnique) (liftIO newUnique)
+instance IntegerSupply JMacroPart where
+ nextInteger =
+  fmap (fromIntegral . (`mod` 1024) . hashUnique) (liftIO newUnique)
 ~~~~
 
 This should be safe as long as you have less than 1024 different JMacro blocks on a single page.

@@ -6,7 +6,6 @@ So far we have only tried to look up `String` values
 using `look`. But the `RqData` module provides a
 variety of ways to work with values besides `Strings`.
 
-
 For some types, it is sufficient to use `Read` to parse the `String`
 into a value. `RqData` provides functions such as `lookRead` to assist
 with this. The advantage of using `lookRead` instead of calling `look`
@@ -15,7 +14,8 @@ error handling system neatly.
 
 
 ~~~~ {.haskell}
-lookRead :: (Functor m, Monad m, HasRqData m, Read a) => String -> m a
+lookRead :: (Functor m, Monad m, HasRqData m, FromReqURI a) =>
+            String -> m a
 ~~~~
 
 Here is a trivial example where we create a `lookInt` function which looks for an `Int` parameter named `int`.
@@ -23,8 +23,9 @@ Here is a trivial example where we create a `lookInt` function which looks for a
 
 > module Main where
 >
-> import Control.Applicative ((<$>), (<*>))
-> import Happstack.Server (ServerPart, badRequest, nullConf, ok, simpleHTTP)
+> import Control.Applicative     ((<$>), (<*>))
+> import Happstack.Server        ( ServerPart, badRequest
+>                                , nullConf, ok, simpleHTTP)
 > import Happstack.Server.RqData (RqData, lookRead, getDataFn)
 >
 > lookInt :: RqData Int

@@ -24,8 +24,9 @@ getDataFn :: (HasRqData m, ServerMonad m, MonadIO m) =>
 
 > module Main where
 >
-> import Control.Applicative ((<$>), (<*>))
-> import Happstack.Server (ServerPart, badRequest, nullConf, ok, simpleHTTP)
+> import Control.Applicative  ((<$>), (<*>))
+> import Happstack.Server     ( ServerPart, badRequest, nullConf
+>                             , ok, simpleHTTP)
 > import Happstack.Server.RqData (RqData, look, getDataFn)
 >
 > helloRq :: RqData (String, String)

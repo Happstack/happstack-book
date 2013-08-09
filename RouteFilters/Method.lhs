@@ -13,21 +13,22 @@ Here is a simple demo app:
 
 > module Main where
 >
-> import Control.Monad (msum)
-> import Happstack.Server (Method(GET, POST), dir, method, nullConf, ok, simpleHTTP)
+> import Control.Monad    (msum)
+> import Happstack.Server ( Method(GET, POST), dir, method
+>                         , nullConf, ok, simpleHTTP, seeOther
+>                         )
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ msum
->        [ do method GET
+>        [ do dir "foo" $ do method GET
+>                            ok $ "You did a GET request on /foo\n"
+>        , do method GET
 >             ok $ "You did a GET request.\n"
 >        , do method POST
 >             ok $ "You did a POST request.\n"
->        , dir "foo" $ do method GET
->                         ok $ "You did a GET request on /foo\n"
 >        ]
 
 Using `curl` we can see the expected results for normal `GET` and `POST` requests to `/`:
-
 
      $ curl http://localhost:8000/
     You did a GET request.
@@ -36,12 +37,10 @@ Using `curl` we can see the expected results for normal `GET` and `POST` request
 
 Note that `method` does not require that all the segments of request path have been consumed. We can see in here that `/foo` is accepted, and so is `/foo/bar`.
 
-<pre>
- $ curl http://localhost:8000/foo
-You did a GET request on /foo
- $ curl http://localhost:8000/foo/bar
-You did a GET request on /foo
-</pre>
+     $ curl http://localhost:8000/foo
+    You did a GET request on /foo
+     $ curl http://localhost:8000/foo/bar
+    You did a GET request on /foo
 
 
 You can use `nullDir` to assert that all the path segments have been consumed:

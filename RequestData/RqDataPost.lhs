@@ -3,21 +3,23 @@ Handling Submissions
 --------------------
 
 In the previous example we only looked at parameters in the
-URL. Looking up values from a form submission (a POST or PUT request)
+URL. Looking up values from a form submission (a `POST` or `PUT` request)
 is almost the same. The only difference is we need to first decode the
 request body using `decodeBody`:
 
 
 > {-# LANGUAGE OverloadedStrings #-}
-> import Control.Monad                      (msum)
-> import Happstack.Server                   ( Response, ServerPart, Method(POST)
->                                           , BodyPolicy(..), decodeBody, defaultBodyPolicy
->                                           , dir, look, nullConf, ok, simpleHTTP
->                                           , toResponse, methodM
->                                           )
+> import Control.Monad    (msum)
+> import Happstack.Server
+>     ( Response, ServerPart, Method(POST)
+>     , BodyPolicy(..), decodeBody, defaultBodyPolicy
+>     , dir, look, nullConf, ok, simpleHTTP
+>     , toResponse, methodM
+>     )
 > import Text.Blaze                         as B
 > import Text.Blaze.Html4.Strict            as B hiding (map)
-> import Text.Blaze.Html4.Strict.Attributes as B hiding (dir, label, title)
+> import Text.Blaze.Html4.Strict.Attributes as B hiding ( dir, label
+>                                                       , title)
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ handlers
@@ -38,10 +40,17 @@ request body using `decodeBody`:
 >       B.head $ do
 >         title "Hello Form"
 >       B.body $ do
->         form ! enctype "multipart/form-data" ! B.method "POST" ! action "/hello" $ do
->              B.label "greeting: " >> input ! type_ "text" ! name "greeting" ! size "10"
->              B.label "noun: "     >> input ! type_ "text" ! name "noun" ! size "10"
->              input ! type_ "submit" ! name "upload"
+>         form ! enctype "multipart/form-data"
+>              ! B.method "POST"
+>              ! action "/hello" $ do
+>               B.label "greeting: " >> input ! type_ "text"
+>                                             ! name "greeting"
+>                                             ! size "10"
+>               B.label "noun: "     >> input ! type_ "text"
+>                                             ! name "noun"
+>                                             ! size "10"
+>               input ! type_ "submit"
+>                     ! name "upload"
 >
 > helloPart :: ServerPart Response
 > helloPart =
@@ -85,11 +94,15 @@ The only argument to `decodeBody` is a `BodyPolicy`. The easiest way to define a
 
 
 ~~~~ {.haskell}
-defaultBodyPolicy :: FilePath  -- ^ directory to *temporarily* store uploaded files in
-                  -> Int64     -- ^ max bytes to save to disk (files)
-                  -> Int64     -- ^ max bytes to hold in RAM (normal form values, etc)
-                  -> Int64     -- ^ max header size (this only affects headers
-                               --                    in the multipart/form-data)
+defaultBodyPolicy :: FilePath  -- ^ directory to *temporarily*
+                               --   store uploaded files in
+                  -> Int64     -- ^ max bytes to save to
+                               --   disk (files)
+                  -> Int64     -- ^ max bytes to hold in RAM
+                               --   (normal form values, etc)
+                  -> Int64     -- ^ max header size (this only
+                               --   affects header in the
+                               --   multipart/form-data)
                   -> BodyPolicy
 ~~~~
 

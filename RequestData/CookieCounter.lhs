@@ -55,21 +55,24 @@ The following example puts all the pieces together. It uses the cookie to store 
 >
 > import Control.Monad.Trans ( liftIO )
 > import Control.Monad       ( msum, mzero )
-> import Happstack.Server    ( CookieLife(Session), Request(rqPaths), ServerPart
->                            , addCookie , askRq, look, mkCookie, nullConf
->                            , ok, readCookieValue, simpleHTTP )
+> import Happstack.Server
+>     ( CookieLife(Session), Request(rqPaths), ServerPart
+>     , addCookie , askRq, look, mkCookie, nullConf
+>     , ok, readCookieValue, simpleHTTP )
 >
 > homePage :: ServerPart String
-> homePage =
->     msum [ do rq <- askRq
->               liftIO $ print (rqPaths rq)
->               mzero
->          , do requests <- readCookieValue "requests"
->               addCookie Session (mkCookie "requests" (show (requests + (1 :: Int))))
->               ok $ "You have made " ++ show requests ++ " requests to this site."
->          , do addCookie Session (mkCookie "requests" (show 2))
->               ok $ "This is your first request to this site."
->          ]
+> homePage = msum
+>   [ do rq <- askRq
+>        liftIO $ print (rqPaths rq)
+>         mzero
+>   , do requests <- readCookieValue "requests"
+>        addCookie Session (mkCookie "requests"
+>                           (show (requests + (1 :: Int))))
+>        ok $ "You have made " ++ show requests ++
+>             " requests to this site."
+>   , do addCookie Session (mkCookie "requests" (show 2))
+>        ok $ "This is your first request to this site."
+>   ]
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ homePage

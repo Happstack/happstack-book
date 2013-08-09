@@ -32,27 +32,27 @@ When a directory is requested, `serveDirectory` will first try to find one of th
 The formula for mapping the URL to a file on disk is just what you would expect:
 
 
-path/to/directory/on/disk &lt;/&gt; unconsumed/portion/of/request/url
+    path/to/directory/on/disk </> unconsumed/portion/of/request/url
 
 
 So if the handler is:
 
 
 ~~~~ {.haskell}
- dir <span style="color: red">"static"</span> $ serveDirectory EnableBrowsing ["index.html"] <span style="color:cyan">"/srv/mysite/datafiles"</span>
+ dir "static" $ serveDirectory EnableBrowsing ["index.html"] "/srv/mysite/data"
 ~~~~
 
 
 And the request URL is:
 
 
-http://localhost/<span style="color: red">static</span>/<span style="color: green">foo/bar.html</span>
+    http://localhost/static/foo/bar.html
 
 
 Then we are going to look for:
 
 
-<span style="color:cyan">/srv/mysite/datafiles</span> &lt;/&gt; <span style="color: green">foo/bar.html</span> => <span style="color:cyan">/srv/mysite/datafiles</span>/<span style="color: green">foo/bar.html</span>
+    /srv/mysite/data </> foo/bar.html => /srv/mysite/data/foo/bar.html
 
 
 The following demo will allow you to browse the directory that the server is running in. (So be careful where you run it).
@@ -74,5 +74,4 @@ File Serving Security
 
 The request URL is sanitized so that users can not escape the top-level directory by adding extra `..` or `/` characters to the URL.
 
-The file serving code <i>will</i> follow symlinks. If you do not want that behavior then you will need to roll your own serving function. See the section on *Advanced File Serving* for more information.
-
+The file serving code *will* follow symlinks. If you do not want that behavior then you will need to roll your own serving function. See the section on *Advanced File Serving* for more information.

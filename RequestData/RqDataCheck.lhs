@@ -15,15 +15,21 @@ In this example we create a type `Vote` with a custom parsing function:
 > module Main where
 >
 > import Control.Applicative ((<$>), (<*>))
-> import Happstack.Server (ServerPart, badRequest, nullConf, ok, simpleHTTP)
-> import Happstack.Server.RqData (RqData, checkRq, getDataFn, look, lookRead)
+> import Happstack.Server
+>     ( ServerPart, badRequest
+>     , nullConf, ok, simpleHTTP)
+> import Happstack.Server.RqData
+>     ( RqData, checkRq
+>     , getDataFn, look, lookRead)
 >
-> data Vote = Yay | Nay deriving (Eq, Ord, Read, Show, Enum, Bounded)
+> data Vote = Yay | Nay
+>     deriving (Eq, Ord, Read, Show, Enum, Bounded)
 >
 > parseVote :: String -> Either String Vote
 > parseVote "yay" = Right Yay
 > parseVote "nay" = Right Nay
-> parseVote str   = Left $ "Expecting 'yay' or 'nay' but got: " ++ str
+> parseVote str   =
+>     Left $ "Expecting 'yay' or 'nay' but got: " ++ str
 >
 > votePart :: ServerPart String
 > votePart =

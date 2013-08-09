@@ -8,7 +8,8 @@ parameters in the URL.
 
 > module Main where
 >
-> import Happstack.Server (ServerPart, look, nullConf, simpleHTTP, ok)
+> import Happstack.Server ( ServerPart, look, nullConf
+>                         , simpleHTTP, ok)
 >
 > helloPart :: ServerPart String
 > helloPart =

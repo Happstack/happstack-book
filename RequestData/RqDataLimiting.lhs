@@ -10,8 +10,8 @@ filters:
 
 
 ~~~~ {.haskell}
-body :: (HasRqData m) => m a -> m a
-queryString ::  (HasRqData m) => m a -> m a
+body        :: (HasRqData m) => m a -> m a
+queryString :: (HasRqData m) => m a -> m a
 ~~~~
 
 Using these filters we can modify `helloPart` so that the `greeting` must come from the QUERY_STRING and the `noun` must come from the request body:

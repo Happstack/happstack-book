@@ -24,9 +24,11 @@ To build the application run:
 
     $ ghc -threaded HelloWorld.hs -o helloworld
 
-The executable will be named `helloworld`.
+The executable will be named `helloworld`. You can run it like:
 
-Alternatively, you can use `runhaskell` and avoid the compilation step.
+    $ ./helloworld
+
+Alternatively, you can use `runhaskell` and avoid the compilation step:
 
     $ runhaskell HelloWorld.hs
 
@@ -90,7 +92,7 @@ We'll examine the various parts of this type signature in the following sections
 
 %%% Configuring the HTTP listener
 
-The first argument is some simple server configuration information. It is defined as:
+The first argument, `Conf`, is some simple server configuration information. It is defined as:
 
 ~~~~ {.haskell}
 data Conf = Conf
@@ -135,13 +137,33 @@ nullConf = Conf
 
 %%% Processing a `Request`
 
-The second argument is a bit more interesting. It is the handler which processes an incoming HTTP `Request` and generates a `Response`. `ServerPartT IO a` is essentially a fancy way of writing a function with the type:
+If we imagined a stripped-down web server, the user would just pass in a handle function with the type:
 
 ~~~~ {.haskell}
-Request -> IO a
+Request -> IO Response
 ~~~~
 
-`simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return the `Response` to the client. When developing your handler, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
+where `Request` and `Response` correspond to HTTP requests and
+response. For every incoming request, the server would fork off a new
+thread thread and call the handler.
+
+While this would work -- the poor developer would have to invent all manner of adhoc mechanisms for mapping routes, adding extra headers, sending compressed results, returning errors, and other common tasks.
+
+Instead ,`simpleHTTP` takes a handler with the type:
+
+~~~~ {.haskell}
+(ToMessage a) => ServerPartT IO a
+~~~~
+
+There are three key differences:
+
+ 1. The `ServerPartT` monad transformer adds a bunch of functionality on top of the base IO monad
+
+ 2. the `Request` argument is now part of `ServerPartT` and can be read using `askRq`.
+
+ 3. The `ToMessage` class is used to convert the return value to a `Response`.
+
+`simpleHTTP` processes each incoming request in its own thread. It will parse the `Request`, call your `ServerPartT` handler, and then return a `Response` to the client. When developing your handler, it is natural to think about things as if you are writing a program which processes a single `Request`, generates a single `Response`, and exits. However it is important when doing I/O, such as writing files to disk, or talking to a database to remember that there may be other threads running simultaneously.
 
 %%% Setting the HTTP response code
 

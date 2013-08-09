@@ -19,7 +19,8 @@ Here is a simple example where the `greeting` parameter is optional:
 > module Main where
 >
 > import Control.Applicative ((<$>), (<*>), optional)
-> import Happstack.Server (ServerPart, look, nullConf, ok, simpleHTTP)
+> import Happstack.Server
+>     (ServerPart, look, nullConf, ok, simpleHTTP)
 >
 > helloPart :: ServerPart String
 > helloPart =

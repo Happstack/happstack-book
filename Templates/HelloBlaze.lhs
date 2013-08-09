@@ -22,7 +22,8 @@ get you started:
 >     H.html $ do
 >       H.head $ do
 >         H.title (H.toHtml title)
->         H.meta ! A.httpEquiv "Content-Type" ! A.content "text/html;charset=utf-8"
+>         H.meta ! A.httpEquiv "Content-Type"
+>                ! A.content "text/html;charset=utf-8"
 >         sequence_ headers
 >       H.body $ do
 >         body
@@ -31,7 +32,9 @@ get you started:
 > helloBlaze =
 >    ok $ toResponse $
 >     appTemplate "Hello, Blaze!"
->                 [H.meta ! A.name "keywords" ! A.content "happstack, blaze, html"]
+>                 [H.meta ! A.name "keywords"
+>                         ! A.content "happstack, blaze, html"
+>                 ]
 >                 (H.p $ do "Hello, "
 >                           H.b "blaze-html!")
 >
