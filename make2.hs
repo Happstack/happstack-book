@@ -54,11 +54,11 @@ chapters = [ "title.txt"
            , "FileServing/FileServingSingle.lhs"
            , "FileServing/FileServingAdvanced.md"
            , "Reform/Reform.lhs"
-{-
            , "WebRoutes/WebRoutesIntro.md"
            , "WebRoutes/WebRoutesDemo.lhs"
            , "WebRoutes/WebRoutesBoomerang.lhs"
            , "WebRoutes/WebRoutesHSP.lhs"
+{-
            , "AcidState/AcidStateIntro.md"
            , "AcidState/AcidStateCounter.lhs"
            , "AcidState/IxSet.lhs"
