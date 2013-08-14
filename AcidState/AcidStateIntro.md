@@ -2,11 +2,24 @@
 `acid-state`
 ============
 
-`acid-state` is a NoSQL, RAM-cloud, persistent data store. One of attractive feature is that it's designed to store arbitrary Haskell datatypes and queries are written using plain old Haskell code. This means you do not have to learn a special query language, or figure out how to turn your beautiful Haskell datastructures into some limited set of ints and strings.
+`acid-state` is a NoSQL, RAM-cloud, persistent data store. One
+attractive feature is that it's designed to store arbitrary Haskell
+datatypes and queries are written using plain old Haskell code. This
+means you do not have to learn a special query language, or figure out
+how to turn your beautiful Haskell datastructures into some limited
+set of ints and strings.
 
-`acid-state` and `safecopy` are the successors to the old `happstack-state` and `happstack-data` libraries. You can learn more at the [acid-state homepage](http://acid-state.seize.it/). `acid-state` is now completely independent from Happstack and can be used with any web framework. However, Happstack is still committed to the improvement and promotion of `acid-state`.
+`acid-state` and `safecopy` are the successors to the old
+`happstack-state` and `happstack-data` libraries. You can learn more
+at the [acid-state
+homepage](http://acid-state.seize.it/). `acid-state` is now completely
+independent from Happstack and can be used with any web
+framework. However, Happstack is still committed to the improvement
+and promotion of `acid-state`.
 
-Apps written using `happstack-state` can be migrated to use `acid-state` relatively easily. Details on the process or documented [here](http://code.google.com/p/happstack/wiki/HapstackStateToAcidState).
+Apps written using `happstack-state` can be migrated to use
+`acid-state` relatively easily. Details on the process or documented
+[here](http://code.google.com/p/happstack/wiki/HapstackStateToAcidState).
 
 How `acid-state` works
 ----------------------
@@ -21,12 +34,11 @@ an external database.
 
 That works great.. as long as your application is only
 single-threaded, and as long as it never crashes, and never needs to
-be restarted. But, for a web application, those requires are
-completely unacceptable. The idea is still appealing
-though. `acid-state` provides a practical implementation of that idea
-which actually implements the ACID guarantees that you may be familiar
-with from traditional relational databases such as MySQL, postgres,
-etc.
+be restarted. For a web application, those requires are completely
+unacceptable -- but the idea is still appealing. `acid-state` provides
+a practical implementation of that idea which actually implements the
+ACID guarantees that you may be familiar with from traditional
+relational databases such as MySQL, postgres, etc.
 
 In `acid-state` we start by defining a type that represents the state
 we wish to store. Then we write a bunch of pure functions that query
