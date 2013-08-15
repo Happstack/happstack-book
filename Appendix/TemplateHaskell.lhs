@@ -23,7 +23,7 @@ There are three new pieces of syntax you will see:
 
 `$( )`
 
-:    This syntax is used to indicate that the code inside is going to generate code. The `$(..)` will be replaced by the generated code, and then the module will be compiled. The use of `$( )` is optional (since GHC 6.12 or so).
+:    This syntax is used to indicate that the code inside is going to generate code. The `$(..)` will be replaced by the generated code, and then the module will be compiled.
 
 `'`
 
