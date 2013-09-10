@@ -38,7 +38,7 @@ The first thing to notice is that we hide `id` and `(.)` from the `Prelude` and 
 >     ( (!), html, head, body, title, p, toHtml
 >     , toValue, ol, li, a)
 > import Text.Blaze.Html4.Strict.Attributes (href)
-> import Text.Boomerang.TH       (derivePrinterParsers)
+> import Text.Boomerang.TH       (makeBoomerangs)
 > import Web.Routes
 >     ( PathInfo(..), RouteT, showURL
 >     , runRouteT, Site(..), setDefault, mkSitePI)
@@ -60,9 +60,9 @@ Next we have our `Sitemap` types again. `Sitemap` is similar to the previous exa
 >     deriving (Eq, Ord, Read, Show, Data, Typeable)
 >
 
-Next we call `derivePrinterParsers`:
+Next we call `makeBoomerangs`:
 
-> $(derivePrinterParsers ''Sitemap)
+> $(makeBoomerangs ''Sitemap)
 >
 
 
@@ -116,8 +116,8 @@ By examining the mapping table and comparing it to the code, you should be able 
 ~~~~ {.haskell}
 xmaph :: (a -> b)
       -> (b -> Maybe a)
-      -> PrinterParser e tok i (a :- o)
-      -> PrinterParser e tok i (b :- o)
+      -> Boomerang e tok i (a :- o)
+      -> Boomerang e tok i (b :- o)
 ~~~~
 
    In this example, we use `xmaph` to convert `int :: Router () (Int :- ())` into `articleId :: Router () (ArticleId :- ())`.
@@ -129,7 +129,7 @@ longest route
 
 
 ~~~~ {.haskell}
-type Router a b = PrinterParser TextsError [Text] a b
+type Router a b = Boomerang TextsError [Text] a b
 ~~~~
 
 
@@ -153,9 +153,9 @@ we see that the constructor takes two arguments, but the mapping uses three comb
 
 
 ~~~~ {.haskell}
-int     ::         PrinterParser TextsError [Text] r (Int :- r)
-anyText ::         PrinterParser TextsError [Text] r (Text :- r)
-lit     :: Text -> PrinterParser TextsError [Text] r r
+int     ::         Boomerang TextsError [Text] r (Int :- r)
+anyText ::         Boomerang TextsError [Text] r (Text :- r)
+lit     :: Text -> Boomerang TextsError [Text] r r
 ~~~~
 
 
@@ -165,7 +165,7 @@ Looking at the type of the all three composed together we get:
 
 
 ~~~~ {.haskell}
-int . lit "-" . anyText :: PrinterParser TextsError [Text] a (Int :- (Text :- a))
+int . lit "-" . anyText :: Boomerang TextsError [Text] a (Int :- (Text :- a))
 ~~~~
 
 
@@ -175,7 +175,7 @@ Looking at the type of `rUserDetail`, we will see that it has the type:
 
 
 ~~~~ {.haskell}
- rUserDetail :: PrinterParser e tok (Int :- (Text :- r)) (Sitemap :- r)
+ rUserDetail :: Boomerang e tok (Int :- (Text :- r)) (Sitemap :- r)
 ~~~~
 
 
