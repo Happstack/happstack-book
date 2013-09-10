@@ -6,3 +6,5 @@ Reform.lhs: remove html formatting
 In TemplateHaskell.lhs `''` renders as a double quote in the pdf.
 
 TemplatesHeist.lhs: #include
+
+figure out a way to add an index

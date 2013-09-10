@@ -2,7 +2,7 @@ module Main where
 
 import Control.Applicative        ((<$>))
 import Control.Monad              ((<=<))
-import Data.List                  (intersperse)
+import Data.List                  (intersperse, isSuffixOf)
 import Development.Shake
 import Development.Shake.FilePath
 import SoHFilter (sohFilter)
@@ -64,16 +64,22 @@ chapters = [ "title.txt"
 this           = "make2.hs"
 allChapters    = "_build/allChapters.md"
 allChaptersSoH = "_build/allChaptersSoH.md"
+htmlPubURL     = "http://www.happstack.com/docs/crashcourse/"
 
 main :: IO ()
 main = shake shakeOptions $ do
-         want ["_build/book.html", "_build/book.pdf", "_build/book.md"]
+         let src = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
+         want $ ["_build/book.html", "_build/book.pdf", "_build/book.md"] ++ src
          allChapters *> \out ->
              do need (this : chapters)
                 allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM readFile' chapters
                 writeFileChanged allChapters allChaptersTxt
                 system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", allChapters]
                 system' "sed" ["-i", "s/%%%/\\#\\#\\#/", allChapters]
+         "_build/src//*.hs" *> \out ->
+             do let inLhs = drop 11 $ out -<.> "lhs"
+                need [this,inLhs]
+                system' "sed" ["-n","s/^> \\?//w " ++ out, inLhs]
          "_build/book.html" *> \out ->
              do need [this,  allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
