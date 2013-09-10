@@ -3,7 +3,7 @@ Limiting lookup to `QUERY_STRING` or request body
 -----------------------------------------------
 
 By default, `look` and friends will search both the QUERY_STRING the
-`request body (aka, `POST`/`PUT` data) for a key. But sometimes we want
+request body (aka, `POST`/`PUT` data) for a key. But sometimes we want
 to specify that only the `QUERY_STRING` or request body should be
 searched. This can be done by using the `body` and `queryString`
 filters:
