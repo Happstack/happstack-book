@@ -210,41 +210,17 @@ messages/standard/jbo.msg
 The contents of the files are:
 
 `messages/standard/en.msg`
-<div class="code wide">
-\#ifdef HsColour
-<pre>
 \#include "messages/standard/en.msg"
-</pre>
-\#endif
-</div>
 
 `messages/standard/en-GB.msg`
-<div class="code wide">
-\#ifdef HsColour
-<pre>
 \#include "messages/standard/en-GB.msg"
-</pre>
-\#endif
-</div>
 
 `messages/standard/jbo.msg`
-<div class="code wide">
-\#ifdef HsColour
-<pre>
 \#include "messages/standard/jbo.msg"
-</pre>
-\#endif
-</div>
 
 The format is very simple. Each line looks like:
 
-<div class="code">
-\#ifdef HsColour
-<pre>
-Constructor arg0 arg1 .. argn: translation text
-</pre>
-\#endif
-</div>
+    Constructor arg0 arg1 .. argn: translation text
 
  1. `Constructor` is a valid Haskell constructor name that we will use to reference this translation
  2. it is followed by 0 or more variable names
@@ -255,11 +231,8 @@ You may also notice that in `en.msg` the arguments contain types like `n@Int`. A
 
 You may also notice that the Lojban translation is missing the `Problems` constructor. Since there is no translation provided, `renderMessage` will use the default translation (which, in this case will come from `en.msg`).
 
-<!--
 
-Due to TH staging restrictions this code must come before the `mkMessage` call below. But we are not ready to talk about it yet in the tutorial. So it is commented out here.
-
-\#ifndef HsColour
+Due to TH staging restrictions this code must come before the `mkMessage` call below. But we are not ready to talk about it yet in the tutorial. So ignore it until later.
 
 > plural_en :: (Integral i) => i -> String -> String -> String
 > plural_en 1 x _ = x
@@ -272,9 +245,6 @@ Due to TH staging restrictions this code must come before the `mkMessage` call b
 > thing_tr :: Lang -> Thing -> Strict.Text
 > thing_tr lang thing = renderMessage DemoApp [lang] thing
 >
-
-\#endif
--->
 
 To load the message files we first need to define our `master` type:
 
@@ -457,13 +427,7 @@ mkMessageFor ::
 We can create a set of `.msg` files for the `Thing` type like this (note the file path):
 
 `messages/thing/en.msg`
-<div class="code">
-\#ifdef HsColour
-<pre>
 \#include "messages/thing/en.msg"
-</pre>
-\#endif
-</div>
 
 And then use `mkMessageFor` to create a `RenderMessage` instance:
 
