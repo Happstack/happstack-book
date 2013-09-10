@@ -64,12 +64,13 @@ chapters = [ "title.txt"
 this           = "make2.hs"
 allChapters    = "_build/allChapters.md"
 allChaptersSoH = "_build/allChaptersSoH.md"
-htmlPubURL     = "http://www.happstack.com/docs/crashcourse/"
+-- srclink        = "http://www.happstack.com/docs/book/src"
 
 main :: IO ()
-main = shake shakeOptions $ do
-         let src = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
-         want $ ["_build/book.html", "_build/book.pdf", "_build/book.md"] ++ src
+main = shakeArgs shakeOptions $ do
+         let src  = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
+             tgts = ["_build/book.html", "_build/book.pdf", "_build/book.md"] ++ src
+         want tgts
          allChapters *> \out ->
              do need (this : chapters)
                 allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM readFile' chapters
@@ -82,7 +83,9 @@ main = shake shakeOptions $ do
                 system' "sed" ["-n","s/^> \\?//w " ++ out, inLhs]
          "_build/book.html" *> \out ->
              do need [this,  allChapters]
-                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
+--                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
+                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
+                system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/new\\/src/", out]
          "_build/book.pdf" *> \out ->
              do need [this, allChapters]
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
@@ -95,4 +98,9 @@ main = shake shakeOptions $ do
                 system' "sed" ["-i", "s/import Happstack.Server/import Happstack.Server.Env/", out]
                 system' "sed" ["-i", "s/sourceCode literate haskell/haskell web active/", out]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","markdown_soh","-o", out, allChapters_]
+         phony "publish" $
+             do need tgts
+                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "jeremy@happstack.com:public_html/happstack-crashcourse/new/"]
+
+--	rsync -avxz --exclude '*.o' --exclude '*.hi' html/ jeremy@happstack.com:public_html/happstack-crashcourse/
 
