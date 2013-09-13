@@ -210,13 +210,22 @@ messages/standard/jbo.msg
 The contents of the files are:
 
 `messages/standard/en.msg`
-\#include "messages/standard/en.msg"
+
+~~~~ {.sourceCode}
+#include "messages/standard/en.msg"
+~~~~
 
 `messages/standard/en-GB.msg`
-\#include "messages/standard/en-GB.msg"
+
+~~~~ {.sourceCode}
+#include "messages/standard/en-GB.msg"
+~~~~
 
 `messages/standard/jbo.msg`
-\#include "messages/standard/jbo.msg"
+
+~~~~ {.sourceCode}
+#include "messages/standard/jbo.msg"
+~~~~
 
 The format is very simple. Each line looks like:
 

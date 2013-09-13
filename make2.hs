@@ -26,7 +26,7 @@ chapters = [ "title.txt"
            , "Templates/HSX/hsx-qq.lhs"
            , "Templates/HSX/What.lhs"
            , "Templates/HSX/WhatMore.lhs"
-           , "Templates/HSX/I18n.lhs"
+           , "Templates/HSX/I18n.cpp.lhs"
            , "Templates/Heist/TemplatesHeist.lhs"
            , "Templates/JMacro.lhs"
            , "RequestData/RqDataIntro.md"
@@ -69,14 +69,23 @@ allChaptersSoH = "_build/allChaptersSoH.md"
 main :: IO ()
 main = shakeArgs shakeOptions $ do
          let src  = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
-             tgts = ["_build/book.html", "_build/book.pdf", "_build/book.md"] ++ src
+             tgts = ["_build/book.html", "_build/book.pdf", "_build/book.md", "_build/theme.css"] ++ src
          want tgts
          allChapters *> \out ->
              do need (this : chapters)
-                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM readFile' chapters
+                let loadFile :: FilePath -> Action String
+                    loadFile fp
+                        | isSuffixOf ".cpp.lhs" fp =
+                            do (Stdout r) <- command [] "cpphs" ["--noline",fp]
+                               return r
+                        | otherwise = readFile' fp
+                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM loadFile chapters
                 writeFileChanged allChapters allChaptersTxt
                 system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", allChapters]
                 system' "sed" ["-i", "s/%%%/\\#\\#\\#/", allChapters]
+         "_build/theme.css" *> \out ->
+             do need [this, "theme.css"]
+                copyFile' "theme.css" out
          "_build/src//*.hs" *> \out ->
              do let inLhs = drop 11 $ out -<.> "lhs"
                 need [this,inLhs]
@@ -84,7 +93,8 @@ main = shakeArgs shakeOptions $ do
          "_build/book.html" *> \out ->
              do need [this,  allChapters]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
-                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
+--                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
+                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","theme.css","-o", out, allChapters]
                 system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/new\\/src/", out]
          "_build/book.pdf" *> \out ->
              do need [this, allChapters]
