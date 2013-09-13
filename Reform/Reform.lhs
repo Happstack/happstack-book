@@ -519,7 +519,7 @@ For even greater control we could use the `Text.Reform.Generalized.errors` funct
 
 ~~~~{.haskell}
 errors :: Monad m =>
-          ([error] -> view) -- ^ function to convert the error messages into a view
+          ([error] -> view) -- ^ convert the error messages into a view
        -> Form m input error view () ()
 ~~~~
 

@@ -1,3 +1,6 @@
+Heist HTML5 and XML Templates
+-----------------------------
+
 To enable Heist support you need to install the `happstack-heist` package.
 
 Heist is a hybrid Haskell+XML templating solution for generating XML

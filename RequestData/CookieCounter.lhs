@@ -21,7 +21,10 @@ cookie will not actually be set until the `Response` is sent.
 
 ~~~~ {.haskell}
 -- | add the 'Cookie' to the current 'Response'
-addCookie :: (MonadIO m, FilterMonad Response m) => CookieLife -> Cookie -> m ()
+addCookie :: (MonadIO m, FilterMonad Response m) =>
+             CookieLife
+          -> Cookie
+          -> m ()
 ~~~~
 
 

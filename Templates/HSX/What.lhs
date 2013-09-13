@@ -75,9 +75,13 @@ class Monad m => XMLGen m where
  type StringType m
  data ChildType m
  data AttributeType m
- genElement    :: Name (StringType m) -> [XMLGenT m [AttributeType m]]
-               -> [XMLGenT m [ChildType m]] -> XMLGenT m (XMLType m)
- genEElement   :: Name (StringType m) -> [XMLGenT m [AttributeType m]]                              -> XMLGenT m (XMLType m)
+ genElement    :: Name (StringType m)
+               -> [XMLGenT m [AttributeType m]]
+               -> [XMLGenT m [ChildType m]]
+               -> XMLGenT m (XMLType m)
+ genEElement   :: Name (StringType m)
+               -> [XMLGenT m [AttributeType m]]
+               -> XMLGenT m (XMLType m)
  genEElement n ats = genElement n ats []
  xmlToChild    :: XMLType m    -> ChildType m
  pcdataToChild :: StringType m -> ChildType m

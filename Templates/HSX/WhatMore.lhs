@@ -60,7 +60,8 @@ Sometimes a type signature for the parent function is not enough. For example, l
 
 ~~~~{.haskell}
 
-> ambiguous :: (EmbedAsChild m String, StringType m ~ Text) => XMLGenT m (XMLType m)
+> ambiguous :: (EmbedAsChild m String, StringType m ~ Text) =>
+>              XMLGenT m (XMLType m)
 > ambiguous = [hsx| <p><% fromString "ambiguous" %></p> |]
 
 ~~~~

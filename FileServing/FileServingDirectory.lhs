@@ -9,9 +9,10 @@ The most common way to serve files is by using `serveDirectory`:
 data Browsing  = EnableBrowsing | DisableBrowsing
 
 serveDirectory :: ( WebMonad Response m, ServerMonad m, FilterMonad Response m
-                  , MonadIO m, MonadPlus m ) =>
+                  , MonadIO m, MonadPlus m
+                  ) =>
                   Browsing    -- ^ enable/disable directory browsing
-               -> [FilePath]  -- ^ index file names, used when path is a directory
+               -> [FilePath]  -- ^ index file names
                -> FilePath    -- ^ file/directory to serve
                -> m Response
 ~~~~
@@ -39,7 +40,8 @@ So if the handler is:
 
 
 ~~~~ {.haskell}
- dir "static" $ serveDirectory EnableBrowsing ["index.html"] "/srv/mysite/data"
+ dir "static" $
+  serveDirectory EnableBrowsing ["index.html"] "/srv/mysite/data"
 ~~~~
 
 
@@ -60,7 +62,9 @@ The following demo will allow you to browse the directory that the server is run
 
 > module Main where
 >
-> import Happstack.Server (Browsing(EnableBrowsing), nullConf, serveDirectory, simpleHTTP)
+> import Happstack.Server ( Browsing(EnableBrowsing), nullConf
+>                         , serveDirectory, simpleHTTP
+>                         )
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ serveDirectory EnableBrowsing [] "."

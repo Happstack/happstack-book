@@ -211,19 +211,19 @@ The contents of the files are:
 
 `messages/standard/en.msg`
 
-~~~~ {.sourceCode}
+~~~~ {.extra-wide}
 #include "messages/standard/en.msg"
 ~~~~
 
 `messages/standard/en-GB.msg`
 
-~~~~ {.sourceCode}
+~~~~ {.wide}
 #include "messages/standard/en-GB.msg"
 ~~~~
 
 `messages/standard/jbo.msg`
 
-~~~~ {.sourceCode}
+~~~~
 #include "messages/standard/jbo.msg"
 ~~~~
 
@@ -508,10 +508,12 @@ Now we can use the message constructors inside our templates:
 >       <% body %>
 >       <ul>
 >        <% mapM (\lang ->
->                  <li>
->                    <a [ "href" := ("?_LANG="<> lang) :: Attr Lazy.Text Lazy.Text]><% lang %></a>
->                  </li>)
->               (["en", "en-GB", "jbo"]) %>
+>            <li>
+>             <a ["href" := ("?_LANG="<> lang) :: Attr Lazy.Text Lazy.Text]>
+>              <% lang %>
+>             </a>
+>            </li>)
+>            (["en", "en-GB", "jbo"]) %>
 >       </ul>
 >      </div> |]
 >
@@ -550,10 +552,10 @@ You should not assume that the `Accept-Language` header is always correct. It is
 We can wrap this all up in a little function that converts our `I18N` part into a normal `ServerPart`:
 
 > withI18N :: I18N a -> ServerPart a
-> withI18N part =
->     do  langsOverride <- queryString $ lookTexts' "_LANG"
->         langs         <- bestLanguage <$> acceptLanguage
->         mapServerPartT (flip runReaderT (langsOverride ++ langs)) (unHSPT part)
+> withI18N part = do
+>   langsOverride <- queryString $ lookTexts' "_LANG"
+>   langs         <- bestLanguage <$> acceptLanguage
+>   mapServerPartT (flip runReaderT (langsOverride ++ langs)) (unHSPT part)
 >
 
 And finally, we just have our `route` table and `main` function:

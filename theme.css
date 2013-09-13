@@ -210,7 +210,7 @@ ul#main-menu
   margin-bottom: 3em;
  }
 
-pre.sourceCode
+pre
 {
   box-shadow: 3px 3px 5px 1px #888;
   border-radius: 10px;
@@ -220,7 +220,7 @@ pre.sourceCode
     padding: 0.75em;
 
   font-size: 12pt;
-  width: 45em;
+  width: 48em;
 
   color: white;
   line-height: 1.2em;
@@ -246,10 +246,16 @@ kbd
     color: #333;
 }
 
+.extra-wide
+{
+    width: 90em;
+}
+
 .wide
 {
-    width: 80em;
+    width: 70em;
 }
+
 
 
 code

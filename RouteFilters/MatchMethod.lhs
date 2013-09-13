@@ -27,7 +27,9 @@ handling this automatically in most cases.
 > module Main where
 >
 > import Control.Monad (msum)
-> import Happstack.Server (Method(GET, HEAD), dir, methodM, nullConf, ok, simpleHTTP)
+> import Happstack.Server ( Method(GET, HEAD), dir, methodM
+>                         , nullConf, ok, simpleHTTP
+>                         )
 >
 > main :: IO ()
 > main = simpleHTTP nullConf $ msum
