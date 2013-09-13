@@ -1,11 +1,12 @@
 module Main where
 
 import Control.Applicative        ((<$>))
-import Control.Monad              ((<=<))
+import Control.Monad              ((<=<), mzero)
 import Data.List                  (intersperse, isSuffixOf)
 import Development.Shake
 import Development.Shake.FilePath
 import SoHFilter (sohFilter)
+import System.Exit (ExitCode(..))
 
 chapters :: [FilePath]
 chapters = [ "title.txt"
@@ -69,7 +70,7 @@ allChaptersSoH = "_build/allChaptersSoH.md"
 main :: IO ()
 main = shakeArgs shakeOptions $ do
          let src  = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
-             tgts = ["_build/book.html", "_build/book.pdf", "_build/book.md", "_build/theme.css"] ++ src
+             tgts = ["_build/book.html", "_build/book.pdf", "_build/book.epub", "_build/book.mobi", "_build/book.md", "_build/theme.css"] ++ src
          want tgts
          allChapters *> \out ->
              do need (this : chapters)
@@ -99,6 +100,15 @@ main = shakeArgs shakeOptions $ do
          "_build/book.pdf" *> \out ->
              do need [this, allChapters]
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
+         "_build/book.epub" *> \out ->
+             do need [this, allChapters]
+                system' "pandoc" ["-f", "markdown+lhs","-o", out, allChapters]
+         "_build/book.mobi" *> \out ->
+             do need [this, "_build/book.epub"]
+                (Exit c) <- command [] "kindlegen" ["_build/book.epub"]
+                if (c == ExitSuccess) || (c == ExitFailure 1)
+                   then return ()
+                   else error $ "kindlgen failed with exit code: " ++ show c
          "_build/book.md" *> \out ->
              do need (this:"SoHFilter.hs":chapters)
                 allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM (sohFilter <=< readFile') chapters
