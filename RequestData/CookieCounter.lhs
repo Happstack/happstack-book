@@ -28,7 +28,7 @@ addCookie :: (MonadIO m, FilterMonad Response m) =>
 ~~~~
 
 
-The first argument of `addCookie` specifies how long the browser should keep the cookie around. See the <a href="#cookie_life">cookie lifetime</a> section for more information on `CookieLife`.
+The first argument of `addCookie` specifies how long the browser should keep the cookie around. See the cookie lifetime section for more information on `CookieLife`.
 
 To lookup a cookie, we use some `HasRqData` functions. There are only three cookie related functions:
 
@@ -81,7 +81,7 @@ The following example puts all the pieces together. It uses the cookie to store 
 > main = simpleHTTP nullConf $ homePage
 
 
-Source code for the app is [here](http://srclink/CookieCounter.hs).
+Source code for the app is [here](http://srclink/RequestData/CookieCounter.hs).
 
 Now if you visit [http://localhost:8000/](http://localhost:8000/) you will get a message like:
 

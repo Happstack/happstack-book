@@ -211,3 +211,6 @@ main = simpleHTTP nullConf $ ok (toResponse "Hello, World!")
 ~~~
 
 Happstack comes with pre-defined `ToMessage` instances for many types such as `Text.Html.Html`, `Text.XHtml.Html`, `String`, the types from HSP, and more.
+
+Source code for this app is [here](http://srclink/HelloWorld.hs).
+

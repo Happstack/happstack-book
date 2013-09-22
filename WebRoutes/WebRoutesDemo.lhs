@@ -293,7 +293,7 @@ main = simpleHTTP nullConf $ msum
 ~~~~
 
 
-Source code for the app is [here](http://srclink/WebRoutesDemo.hs).
+Source code for the app is [here](http://srclink/WebRoutes/WebRoutesDemo.hs).
 
 `web-routes` + Type Families
 ----------------------------

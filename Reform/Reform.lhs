@@ -847,5 +847,5 @@ Here is a main function that ties all the examples together:
 
 There is nothing `reform` specific about it.
 
-Source code for the app is [here](http://srclink/Reform.hs).
+Source code for the app is [here](http://srclink/Reform/Reform.hs).
 

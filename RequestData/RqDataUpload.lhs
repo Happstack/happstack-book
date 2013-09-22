@@ -81,7 +81,7 @@ understand something, try looking in earlier material.
 >         p (toHtml $ "uploaded name:  " ++ uploadName)
 >         p (toHtml $ "content-type:   " ++ show contentType)
 
-Source code for the app is [here](http://srclink/RqDataUpload.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataUpload.hs).
 
 File uploads important reminder
 -------------------------------

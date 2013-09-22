@@ -132,7 +132,7 @@ so putting those together we get our handlers:
 >        ]
 
 
-Source code for the app is [here](http://srclink/TemplatesHeist.hs). You will also need to download the source for [factorial.tpl](http://srclink/factorial.tpl) and save it in the same directory as `TemplateHeist.hs`
+Source code for the app is [here](http://srclink/Templates/TemplatesHeist.hs). You will also need to download the source for [factorial.tpl](http://srclink/factorial.tpl) and save it in the same directory as `TemplateHeist.hs`
 
 If you point your browser at [http://localhost:8000/factorial](http://localhost:8000/factorial) you should see the factorial page. You can point your browser at [http://localhost:8000/reload](http://localhost:8000/reload) to reload the template.
 

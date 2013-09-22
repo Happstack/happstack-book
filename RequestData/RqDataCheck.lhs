@@ -43,7 +43,7 @@ In this example we create a type `Vote` with a custom parsing function:
 > main :: IO ()
 > main = simpleHTTP nullConf $ votePart
 
-Source code for the app is [here](http://srclink/RqDataCheck.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataCheck.hs).
 
 
 Now if we visit [http://localhost:8000/?vote=yay](http://localhost:8000/?vote=yay), we will get the message:

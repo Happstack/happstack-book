@@ -365,7 +365,7 @@ A different option would be for `fooPlugin` to use its own `ReaderT`
 
 We will come back to this in detail later when we explore plugins and libraries.
 
-Source code for the app is [here](http://srclink/AcidStateAdvanced.hs).
+Source code for the app is [here](http://srclink/AcidState/AcidStateAdvanced.hs).
 
 
 

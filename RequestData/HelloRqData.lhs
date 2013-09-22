@@ -21,7 +21,7 @@ parameters in the URL.
 > main = simpleHTTP nullConf $ helloPart
 
 
-Source code for the app is [here](http://srclink/HelloRqData.hs).
+Source code for the app is [here](http://srclink/RequestData/HelloRqData.hs).
 
 Now if we visit [http://localhost:8000/?greeting=hello&amp;noun=rqdata](http://localhost:8000/?greeting=hello&amp;noun=rqdata), we will get the message `hello, rqdata`.
 

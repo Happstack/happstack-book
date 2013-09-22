@@ -31,7 +31,7 @@ Here is a simple example where the `greeting` parameter is optional:
 > main = simpleHTTP nullConf $ helloPart
 
 
-Source code for the app is [here](http://srclink/RqDataOptional.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataOptional.hs).
 
 If we visit [http://localhost:8000/?greeting=hello](http://localhost:8000/?greeting=hello), we will get `Just "hello"`.
 

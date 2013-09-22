@@ -52,3 +52,5 @@ use the `-I` flag which does a `HEAD` request:
     Server: Happstack/0.5.0
 
 Happstack automatically notices that it is a `HEAD` request, and does not send the body.
+
+Source code for this app is [here](http://srclink/RouteFilters/MatchMethod.hs).

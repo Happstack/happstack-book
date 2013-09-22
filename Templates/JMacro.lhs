@@ -605,7 +605,7 @@ and our routes:
 >
 
 
-Source code for the app is [here](http://srclink/JMacro.hs).
+Source code for the app is [here](http://srclink/Templates/JMacro.hs).
 
 Alternative `IntegerSupply` instance
 ------------------------------------

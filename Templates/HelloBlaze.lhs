@@ -41,7 +41,7 @@ get you started:
 > main :: IO ()
 > main = simpleHTTP nullConf $ helloBlaze
 
-Source code for the app is [here](http://srclink/HelloBlaze.hs).
+Source code for the app is [here](http://srclink/Templates/HelloBlaze.hs).
 
 Now if we visit [http://localhost:8000/](http://localhost:8000/), we will get an HTML page which says:
 

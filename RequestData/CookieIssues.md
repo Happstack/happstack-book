@@ -8,8 +8,8 @@ Despite their apparently simplicity, `Cookies` are the source of many bugs and s
 
 To get an understanding of cookie security issues you should search for:
 
- * [http://www.google.com/search?q=cookie+security+issues](cookie security issues)
- * [http://www.google.com/search?q=cookie+XSS](cookie XSS).
+ * [cookie security issues](http://www.google.com/search?q=cookie+security+issues)
+ * [cookie XSS](http://www.google.com/search?q=cookie+XSS)
 
 One important thing to remember is that the user can modify the
 cookie. So it would be a bad idea to do, `addCookie Session (mkCookie

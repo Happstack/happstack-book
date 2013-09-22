@@ -58,8 +58,7 @@ href="http://hackage.haskell.org/packages/archive/safecopy/0.6.1/doc/html/Data-S
 docs</a>. (A detailed section on migration for the Crash Course is
 planned, but not yet written).
 
-If you are not familiar with Template Haskell be sure to read this <a
-href="TemplateHaskell.html">brief intro to Template Haskell</a>
+If you are not familiar with Template Haskell be sure to read the Template Haskell appendix for brief intro to Template Haskell.
 
 Next we will define an initial value that is suitable for initializing
 the `CounterState` state.
@@ -218,4 +217,4 @@ Finally, we have our main function:
 
 The shutdown sequence creates a checkpoint when the server exits. This is good practice because it helps the server start faster, and makes migration go more smoothly. Calling `createCheckpointAndClose` is not critical to data integrity. If the server crashes unexpectedly, it will replay all the logged transactions (Durability). However, it is a good idea to create a checkpoint on close. If you change an existing update event, and then tried to replay old versions of the event, things would probably end poorly. However, restoring from a checkpoint does not require the old events to be replayed. Hence, always creating a checkpoint on shutdown makes it easier to upgrade the server.
 
-Source code for the app is [here](http://srclink/AcidStateCounter.hs).
+Source code for the app is [here](http://srclink/AcidState/AcidStateCounter.hs).

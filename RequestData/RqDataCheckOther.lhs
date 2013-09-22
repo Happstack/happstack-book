@@ -45,7 +45,7 @@ within range:
 > main = simpleHTTP nullConf $ oneToTenPart
 
 
-Source code for the app is [here](http://srclink/RqDataCheckOther.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataCheckOther.hs).
 
 Now if we visit [http://localhost:8000/?i=10](http://localhost:8000/?i=10), we will get the message:
 

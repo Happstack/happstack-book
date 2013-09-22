@@ -293,6 +293,6 @@ Next we use `implSite` to embed the `Site` into a normal Happstack route:
 >   ]
 >
 
-Source code for the app is [here](http://srclink/WebRoutesBoomerang.hs).
+Source code for the app is [here](http://srclink/WebRoutes/WebRoutesBoomerang.hs).
 
 In this example, we only used a few simple combinators. But `boomerang` provides a whole range of combinators such as `many`, `some`, `chain`, etc. For more information check out the [haddock documentation for `boomerang`](http://hackage.haskell.org/package/boomerang). Especially the `Text.Boomerang.Combinators` and `Text.Boomerang.Texts` modules.

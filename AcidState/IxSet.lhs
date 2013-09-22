@@ -570,5 +570,5 @@ The remainder of the code in this section integrates the above code into a fully
 >                     simpleHTTP nullConf (route acid))
 
 
-Source code for the app is [here](http://srclink/IxSet.hs).
+Source code for the app is [here](http://srclink/AcidState/IxSet.hs).
 

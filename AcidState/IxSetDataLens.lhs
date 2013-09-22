@@ -498,4 +498,4 @@ All we did was change the first `^%=` to `%=`. This works because `Update` is an
 
 `data-lens-fd` provides a few other functions that you can use to get, set, and modify the state in an `Update` or `Query` event. Check out the <a href='http://hackage.haskell.org/package/data-lens-fd'> haddock documentation for data-lens-fd</a>.
 
-Source code for the app is [here](http://srclink/IxSetDataLens.hs).
+Source code for the app is [here](http://srclink/AcidState/IxSetDataLens.hs).

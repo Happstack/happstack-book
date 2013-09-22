@@ -44,7 +44,7 @@ Here is a trivial example where we create a `lookInt` function which looks for a
 > main = simpleHTTP nullConf $ intPart
 
 
-Source code for the app is [here](http://srclink/RqDataRead.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataRead.hs).
 
 
 Now if we visit [http://localhost:8000/?int=1](http://localhost:8000/?int=1), we will get the message:

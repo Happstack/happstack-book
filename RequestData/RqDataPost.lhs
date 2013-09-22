@@ -60,7 +60,7 @@ request body using `decodeBody`:
 >        ok $ toResponse (greeting ++ ", " ++ noun)
 
 
-Source code for the app is [here](http://srclink/RqDataPost.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataPost.hs).
 
 Why is `decodeBody` even needed?
 --------------------------------

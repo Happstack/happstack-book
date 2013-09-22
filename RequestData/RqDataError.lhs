@@ -45,7 +45,7 @@ getDataFn :: (HasRqData m, ServerMonad m, MonadIO m) =>
 > main :: IO ()
 > main = simpleHTTP nullConf $ helloPart
 
-Source code for the app is [here](http://srclink/RqDataError.hs).
+Source code for the app is [here](http://srclink/RequestData/RqDataError.hs).
 
 If we visit
 [http://localhost:8000/?greeting=hello&amp;noun=world](http://localhost:8000/?greeting=hello&amp;noun=world),

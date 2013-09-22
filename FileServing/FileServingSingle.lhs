@@ -58,5 +58,5 @@ The following, example attempts to serve its own source code for any incoming re
 >  simpleHTTP nullConf $
 >   serveFile (asContentType "text/x-haskell") "FileServingSingle.hs"
 
-Source code for the app is [here](http://srclink/FileServingSingle.hs).
+Source code for the app is [here](http://srclink/FileServing/FileServingSingle.hs).
 
