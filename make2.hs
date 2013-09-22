@@ -5,7 +5,7 @@ import Control.Monad              ((<=<), mzero)
 import Data.List                  (intersperse, isSuffixOf)
 import Development.Shake
 import Development.Shake.FilePath
-import SoHFilter (sohFilter)
+import SoHFilter (FixupMode(Consolidate, Remove), sohFilter)
 import System.Exit (ExitCode(..))
 
 chapters :: [FilePath]
@@ -62,7 +62,8 @@ chapters = [ "title.txt"
            , "Appendix/TemplateHaskell.md"
            ]
 
-this           = "make2.hs"
+these           :: [FilePath]
+these           = ["make2.hs","SoHFilter.hs"]
 allChapters    = "_build/allChapters.md"
 allChaptersSoH = "_build/allChaptersSoH.md"
 -- srclink        = "http://www.happstack.com/docs/book/src"
@@ -73,45 +74,52 @@ main = shakeArgs shakeOptions $ do
              tgts = ["_build/book.html", "_build/book.pdf", "_build/book.epub", "_build/book.mobi", "_build/book.md", "_build/theme.css"] ++ src
          want tgts
          allChapters *> \out ->
-             do need (this : chapters)
+             do need (these ++ chapters)
                 let loadFile :: FilePath -> Action String
                     loadFile fp
                         | isSuffixOf ".cpp.lhs" fp =
                             do (Stdout r) <- command [] "cpphs" ["--noline",fp]
                                return r
+--                               sohFilter Remove r
+                        | isSuffixOf ".lhs" fp =
+                            do c <- readFile' fp
+--                               sohFilter Remove c
+                               return c
                         | otherwise = readFile' fp
+--                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM (loadFile) chapters
                 allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM loadFile chapters
                 writeFileChanged allChapters allChaptersTxt
                 system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", allChapters]
                 system' "sed" ["-i", "s/%%%/\\#\\#\\#/", allChapters]
          "_build/theme.css" *> \out ->
-             do need [this, "theme.css"]
+             do need $ "theme.css" : these
                 copyFile' "theme.css" out
          "_build/src//*.hs" *> \out ->
              do let inLhs = drop 11 $ out -<.> "lhs"
-                need [this,inLhs]
+                need $ inLhs : these
                 system' "sed" ["-n","s/^> \\?//w " ++ out, inLhs]
          "_build/book.html" *> \out ->
-             do need [this,  allChapters]
+             do need $ allChapters : these
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","theme.css","-o", out, allChapters]
                 system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/new\\/src/", out]
          "_build/book.pdf" *> \out ->
-             do need [this, allChapters]
+             do need $ allChapters:these
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
          "_build/book.epub" *> \out ->
-             do need [this, allChapters]
+             do need $ allChapters:these
                 system' "pandoc" ["-f", "markdown+lhs","-o", out, allChapters]
          "_build/book.mobi" *> \out ->
-             do need [this, "_build/book.epub"]
+             do need $ "_build/book.epub":these
                 (Exit c) <- command [] "kindlegen" ["_build/book.epub"]
                 if (c == ExitSuccess) || (c == ExitFailure 1)
                    then return ()
                    else error $ "kindlgen failed with exit code: " ++ show c
          "_build/book.md" *> \out ->
-             do need (this:"SoHFilter.hs":chapters)
-                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM (sohFilter <=< readFile') chapters
+             do need $ chapters++these
+                     -- FIXME: probably needs to call loadFile
+                allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM ((sohFilter Consolidate) <=< readFile') chapters
                 writeFileChanged out allChaptersTxt
                 system' "sed" ["-i", "s/%%%%/\\#\\#\\#\\#/", out]
                 system' "sed" ["-i", "s/%%%/\\#\\#\\#/", out]

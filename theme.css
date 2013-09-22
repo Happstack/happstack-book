@@ -304,6 +304,11 @@ code > span.al { color: #ff0000; font-weight: bold; }
 code > span.fu { color: DarkGoldenrod;  }
 code > span.er { color: #ff0000; font-weight: bold; }
 
+.source-goes-here
+{
+    display: none;
+}
+
 /* These colors need adjusting */
 /*
 .hs-keyglyph { color: DarkGoldenrod;  }

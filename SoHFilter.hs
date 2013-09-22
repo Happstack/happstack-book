@@ -4,15 +4,30 @@ import Control.Monad.Trans (MonadIO(liftIO))
 import qualified Data.Set  as Set
 import System.Environment  (getArgs)
 import Text.Pandoc
-
+{-
 sohMain :: IO ()
 sohMain =
     do [inFile] <- getArgs
        contents <- readFile inFile
        putStr =<< sohFilter contents
+-}
+sohFilter :: (MonadIO m ) => FixupMode -> String -> m String
+sohFilter Remove contents = liftIO $
+    do let readerOpts = def {- { readerExtensions = Set.fromList [ Ext_literate_haskell
+                                                              , Ext_fenced_code_blocks
+                                                              , Ext_fenced_code_attributes
+                                                              , Ext_backtick_code_blocks
+                                                              , Ext_pandoc_title_block
+                                                              ] } -}
+           writerOpts = def {- { writerExtensions = Set.fromList [ Ext_literate_haskell
+                                                              , Ext_fenced_code_blocks
+                                                              , Ext_fenced_code_attributes
+                                                              , Ext_backtick_code_blocks
+                                                              , Ext_pandoc_title_block
+                                                              ] } -}
+       return $ writeMarkdown writerOpts $ bottomUp remove $ readMarkdown readerOpts contents
 
-sohFilter :: (MonadIO m ) => String -> m String
-sohFilter contents = liftIO $
+sohFilter Consolidate contents = liftIO $
     do let readerOpts = def { readerExtensions = Set.fromList [ Ext_literate_haskell
                                                               , Ext_fenced_code_blocks
                                                               , Ext_fenced_code_attributes
@@ -23,7 +38,21 @@ sohFilter contents = liftIO $
                                                               , Ext_backtick_code_blocks
                                                               ] }
 
-       return $ writeMarkdown writerOpts $ bottomUp srcFixups $ readMarkdown readerOpts contents
+       return $ writeMarkdown writerOpts $ bottomUp consolidate $ readMarkdown readerOpts contents
+
+data FixupMode
+    = Consolidate
+    | Remove
+      deriving (Eq, Ord, Read, Show)
+
+remove :: Pandoc -> Pandoc
+remove (Pandoc meta blocks) =
+    let blocks' = filter removeSrcGoesHere blocks
+    in Pandoc meta blocks'
+    where
+      removeSrcGoesHere (CodeBlock (_,cls,_) code) = not $ "source-goes-here" `elem` cls
+      removeSrcGoesHere _                          = True
+
 
 {-
 
@@ -32,8 +61,8 @@ If the file contains an element with 'source-goes-here' then collect all the lit
 If there are no source-goes-here blocks then mark each literate block as 'haskell web active'.
 
 -}
-srcFixups :: Pandoc -> Pandoc
-srcFixups (Pandoc meta blocks) =
+consolidate :: Pandoc -> Pandoc
+consolidate (Pandoc meta blocks) =
     let (literateSrc, sgh) = foldr addSrcChunk ("", False) blocks
         blocks' =
             if sgh
