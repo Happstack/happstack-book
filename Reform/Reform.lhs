@@ -119,6 +119,7 @@ and the `reform-hsp` package:
 > import qualified Data.Text.Lazy    as Lazy
 > import qualified Data.Text         as Strict
 > import Happstack.Server
+> import Happstack.Server.XMLGenT    ()
 > import Happstack.Server.HSP.HTML   ()
 > import HSP
 > import HSP.Monad                   (HSPT(..))
@@ -190,7 +191,7 @@ As you will note it is heavily parameterized:
 In order to keep our type signatures sane, it is convenient to create an application specific type alias for the `Form` type:
 
 > type SimpleForm =
->  Form (AppT IO) [Input] AppError [AppT IO (XMLType (ServerPartT IO))] ()
+>  Form (AppT IO) [Input] AppError [AppT IO XML] ()
 >
 
 `AppError` is an application specific type used to report form validation errors:
@@ -563,7 +564,7 @@ This allows the library authors to create `Proofs` and demand that a `Form` crea
 Let's create a new type alias for `Form` that allows us to actually set the `proof` parameter:
 
 > type ProofForm proof =
->   Form IO [Input] AppError [AppT IO (XMLType (ServerPartT IO))] proof
+>   Form IO [Input] AppError [AppT IO XML] proof
 >
 
 First we will explore the `Proof` related code that would go into a library.
