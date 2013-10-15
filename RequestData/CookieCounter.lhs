@@ -67,7 +67,7 @@ The following example puts all the pieces together. It uses the cookie to store 
 > homePage = msum
 >   [ do rq <- askRq
 >        liftIO $ print (rqPaths rq)
->         mzero
+>        mzero
 >   , do requests <- readCookieValue "requests"
 >        addCookie Session (mkCookie "requests"
 >                           (show (requests + (1 :: Int))))

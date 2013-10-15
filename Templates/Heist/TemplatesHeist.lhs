@@ -44,7 +44,7 @@ tag with the value of `6!`.
 >                               , seeOther, toResponse
 >                               )
 > import Happstack.Server.Heist (heistServe, initHeistCompiled)
-> import Heist                  (getParamNode)
+> import Heist                  (Splices, (##), getParamNode, noSplices)
 > import Heist.Compiled         (Splice, yieldRuntimeText)
 > import qualified Text.XmlHtml as X
 >
@@ -64,7 +64,7 @@ tag with the value of `6!`.
 > main :: IO ()
 > main = do
 >   heistState <- do
->     r <- initHeistCompiled [(T.pack "fact", factSplice)] [] "."
+>     r <- initHeistCompiled (T.pack "fact" ## factSplice) noSplices "."
 >     case r of
 >       (Left e) -> error $ unlines e
 >       (Right heistState) -> return $ heistState

@@ -10,6 +10,7 @@ import System.Exit (ExitCode(..))
 
 chapters :: [FilePath]
 chapters = [ "title.txt"
+           , "Intro.md"
            , "HelloWorld.lhs"
            , "RouteFilters/MonadPlus.lhs"
            , "RouteFilters/RouteFiltersIntro.md"
@@ -26,7 +27,7 @@ chapters = [ "title.txt"
            , "Templates/HSX/hsx2hs.lhs"
            , "Templates/HSX/hsx-qq.lhs"
            , "Templates/HSX/What.lhs"
-           , "Templates/HSX/WhatMore.lhs"
+           , "Templates/HSX/WhatMore.md"
            , "Templates/HSX/I18n.cpp.lhs"
            , "Templates/Heist/TemplatesHeist.lhs"
            , "Templates/JMacro.lhs"
@@ -57,7 +58,7 @@ chapters = [ "title.txt"
            , "AcidState/AcidStateIntro.md"
            , "AcidState/AcidStateCounter.lhs"
            , "AcidState/IxSet.lhs"
-           , "AcidState/IxSetDataLens.lhs"
+--           , "AcidState/IxSetDataLens.lhs"
            , "AcidState/AcidStateAdvanced.lhs"
            , "Appendix/TemplateHaskell.md"
            ]
@@ -71,7 +72,7 @@ allChaptersSoH = "_build/allChaptersSoH.md"
 main :: IO ()
 main = shakeArgs shakeOptions $ do
          let src  = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
-             tgts = ["_build/book.html", "_build/book.pdf", "_build/book.epub", "_build/book.mobi", "_build/book.md", "_build/theme.css"] ++ src
+             tgts = ["_build/happstack-book.html", "_build/happstack-book.pdf", "_build/happstack-book.epub", "_build/happstack-book.mobi", "_build/book.md", "_build/theme.css", "_build/src/messages.zip"] ++ src
          want tgts
          allChapters *> \out ->
              do need (these ++ chapters)
@@ -98,25 +99,25 @@ main = shakeArgs shakeOptions $ do
              do let inLhs = drop 11 $ out -<.> "lhs"
                 need $ inLhs : these
                 system' "sed" ["-n","s/^> \\?//w " ++ out, inLhs]
-         "_build/book.html" *> \out ->
+         "_build/happstack-book.html" *> \out ->
              do need $ allChapters : these
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","theme.css","-o", out, allChapters]
-                system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/new\\/src/", out]
-         "_build/book.pdf" *> \out ->
+                system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/src/g", out]
+         "_build/happstack-book.pdf" *> \out ->
              do need $ allChapters:these
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
-         "_build/book.epub" *> \out ->
+         "_build/happstack-book.epub" *> \out ->
              do need $ allChapters:these
                 system' "pandoc" ["-f", "markdown+lhs","-o", out, allChapters]
-         "_build/book.mobi" *> \out ->
-             do need $ "_build/book.epub":these
-                (Exit c) <- command [] "kindlegen" ["_build/book.epub"]
+         "_build/happstack-book.mobi" *> \out ->
+             do need $ "_build/happstack-book.epub":these
+                (Exit c) <- command [] "kindlegen" ["_build/happstack-book.epub"]
                 if (c == ExitSuccess) || (c == ExitFailure 1)
                    then return ()
                    else error $ "kindlgen failed with exit code: " ++ show c
-         "_build/book.md" *> \out ->
+         "_build/happstack-book.md" *> \out ->
              do need $ chapters++these
                      -- FIXME: probably needs to call loadFile
                 allChaptersTxt <- (concat . intersperse "\n\n") <$> mapM ((sohFilter Consolidate) <=< readFile') chapters
@@ -126,9 +127,16 @@ main = shakeArgs shakeOptions $ do
                 system' "sed" ["-i", "s/import Happstack.Server/import Happstack.Server.Env/", out]
                 system' "sed" ["-i", "s/sourceCode literate haskell/haskell web active/", out]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","markdown_soh","-o", out, allChapters_]
+         "_build/src/messages.zip" *> \out ->
+             do msgs <- getDirectoryFiles "." ["messages//*.msg"]
+                need msgs
+                system' "zip" (out:msgs)
+         phony "check-demos" $
+               do need src
+                  mapM_ (\hs -> system' "ghc" ["-fno-code", hs]) src
          phony "publish" $
              do need tgts
-                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "jeremy@happstack.com:public_html/happstack-crashcourse/new/"]
+                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "jeremy@happstack.com:public_html/happstack-crashcourse/"]
 
 --	rsync -avxz --exclude '*.o' --exclude '*.hi' html/ jeremy@happstack.com:public_html/happstack-crashcourse/
 

@@ -289,9 +289,10 @@ Here is a query function that gets all the posts with a specific status (`Publis
 > postsByStatus :: Status -> Query Blog [Post]
 > postsByStatus status = do
 >  Blog{..} <- ask
->  let posts =
->   IxSet.toDescList (Proxy :: Proxy UTCTime) $ posts @= status
->  return posts
+>  let posts' =
+>        IxSet.toDescList (Proxy :: Proxy UTCTime) $
+>          posts @= status
+>  return posts'
 
 
 
@@ -358,29 +359,26 @@ The remainder of the code in this section integrates the above code into a fully
 > -- It is included inline here to keep the example
 > -- self-contained.
 > css :: Html
-> css = let s = Text.concat
->  [ "body { color: #555; padding: 0; margin: 0; margin-left: 1em;}"
->  , "ul { list-style-type: none; }"
->  , "ol { list-style-type: none; }"
->  , "h1 { font-size: 1.5em; color: #555; margin: 0; }"
->  , ".author { color: #aaa; }"
->  , ".date { color: #aaa; }"
->  , ".tags { color: #aaa; }"
->  , ".post { border-bottom: 1px dotted #aaa; margin-top: 1em; }"
->  , ".bdy  { color: #555; margin-top: 1em; }"
->  , ".post-footer { margin-top: 1em; margin-bottom: 1em; }"
->  , "label { display: inline-block; width: 3em; }"
->  , "#menu { margin: 0; padding: 0; margin-left: -1em;"
->  ,         "border-bottom: 1px solid #aaa; }"
->  , "#menu li { display: inline; margin-left: 1em; }"
->  , "#menu form { display: inline; margin-left: 1em; }"
->  ]
+> css =
+>  let s = Text.concat
+>       [ "body { color: #555; padding: 0; margin: 0; margin-left: 1em;}"
+>       , "ul { list-style-type: none; }"
+>       , "ol { list-style-type: none; }"
+>       , "h1 { font-size: 1.5em; color: #555; margin: 0; }"
+>       , ".author { color: #aaa; }"
+>       , ".date { color: #aaa; }"
+>       , ".tags { color: #aaa; }"
+>       , ".post { border-bottom: 1px dotted #aaa; margin-top: 1em; }"
+>       , ".bdy  { color: #555; margin-top: 1em; }"
+>       , ".post-footer { margin-top: 1em; margin-bottom: 1em; }"
+>       , "label { display: inline-block; width: 3em; }"
+>       , "#menu { margin: 0; padding: 0; margin-left: -1em;"
+>       ,         "border-bottom: 1px solid #aaa; }"
+>       , "#menu li { display: inline; margin-left: 1em; }"
+>       , "#menu form { display: inline; margin-left: 1em; }"
+>       ]
 >  in H.style ! A.type_ "text/css" $ H.toHtml s
 >
-
-
-
-
 
 > -- | edit an existing blog post
 > edit :: AcidState Blog -> ServerPart Response
@@ -459,7 +457,6 @@ The remainder of the code in this section integrates the above code into a fully
 >          update' acid (UpdatePost updatedPost)
 >          case status of
 >            Published ->
->              let url
 >              seeOther ("/view?id=" ++ (show $ unPostId pid))
 >                       (toResponse ())
 >            Draft     ->
@@ -543,7 +540,7 @@ The remainder of the code in this section integrates the above code into a fully
 >  where
 >   editDraftLink Post{..} =
 >     let url = (H.toValue $ "/edit?id=" ++ show (unPostId postId))
->     in H.a ! A.href  $ H.toHtml title
+>     in H.a ! A.href url $ H.toHtml title
 
 > -- | route incoming requests
 > route :: AcidState Blog -> ServerPart Response
@@ -556,9 +553,6 @@ The remainder of the code in this section integrates the above code into a fully
 >             , dir "drafts"      $ drafts acid
 >             , nullDir          >> home acid
 >             ]
-
-
-
 
 
 > -- | start acid-state and the http server

@@ -436,7 +436,10 @@ mkMessageFor ::
 We can create a set of `.msg` files for the `Thing` type like this (note the file path):
 
 `messages/thing/en.msg`
-\#include "messages/thing/en.msg"
+
+~~~~ {.extra-wide}
+#include "messages/thing/en.msg"
+~~~~
 
 And then use `mkMessageFor` to create a `RenderMessage` instance:
 

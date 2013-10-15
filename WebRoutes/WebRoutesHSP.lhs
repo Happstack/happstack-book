@@ -6,10 +6,11 @@ You will need to install the optional `web-routes`, `web-routes-th`,
 `web-routes-hsp` and `happstack-hsp` packages for this section.
 
 
-> {-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
+> {-# LANGUAGE TemplateHaskell, QuasiQuotes, OverloadedStrings #-}
 > module Main where
 >
 > import Control.Applicative ((<$>))
+> import Control.Monad       (msum)
 > import Happstack.Server
 > import Happstack.Server.HSP.HTML
 > import HSP
@@ -65,7 +66,7 @@ Here is the rest of the example:
 > main :: IO ()
 > main = simpleHTTP nullConf $
 >   msum [ dir "favicon.ico" $ notFound (toResponse ())
->        , implSite (pack "http://localhost:8000") empty site
+>        , implSite "http://localhost:8000" "" site
 >        ]
 
 

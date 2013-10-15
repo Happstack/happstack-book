@@ -29,6 +29,7 @@ In this section we will show a slightly more sophisticated version of that solut
 > import Control.Monad        (MonadPlus, mplus)
 > import Control.Monad.Reader ( MonadReader, ReaderT(..)
 >                             , ask)
+> import Control.Monad.State  (get, put)
 > import Control.Monad.Trans  (MonadIO(..))
 > import Data.Acid
 >     ( AcidState(..), EventState(..), EventResult(..)
@@ -42,8 +43,6 @@ In this section we will show a slightly more sophisticated version of that solut
 > import Data.Maybe           (fromMaybe)
 > import Data.SafeCopy        (SafeCopy, base, deriveSafeCopy)
 > import Data.Data            (Data, Typeable)
-> import Data.Lens            ((%=), (!=))
-> import Data.Lens.Template   (makeLens)
 > import Data.Text.Lazy       (Text)
 > import Happstack.Server
 >     ( Happstack, HasRqData, Method(GET, POST), Request(rqMethod)
@@ -127,44 +126,42 @@ Now we can declare a couple `acid-state` types:
 
 > -- State that stores a hit count
 >
-> data CountState = CountState { _count :: Integer }
+> data CountState = CountState { count :: Integer }
 >     deriving (Eq, Ord, Data, Typeable, Show)
 >
 > $(deriveSafeCopy 0 'base ''CountState)
-> $(makeLens ''CountState)
 >
 > initialCountState :: CountState
-> initialCountState = CountState { _count = 0 }
+> initialCountState = CountState { count = 0 }
 >
 > incCount :: Update CountState Integer
-> incCount = count %= succ
+> incCount =
+>     do (CountState c) <- get
+>        let c' = succ c
+>        put (CountState c')
+>        return c'
 >
 > $(makeAcidic ''CountState ['incCount])
 
 > -- State that stores a greeting
 
-> data GreetingState = GreetingState {  _greeting :: Text }
+> data GreetingState = GreetingState {  greeting :: Text }
 >                 deriving (Eq, Ord, Data, Typeable, Show)
 >
 > $(deriveSafeCopy 0 'base ''GreetingState)
-> $(makeLens ''GreetingState)
 >
 > initialGreetingState :: GreetingState
-> initialGreetingState = GreetingState { _greeting = "Hello" }
+> initialGreetingState = GreetingState { greeting = "Hello" }
 >
 > getGreeting :: Query GreetingState Text
-> getGreeting = _greeting <$> ask
+> getGreeting = greeting <$> ask
 >
-> setGreeting :: Text -> Update GreetingState Text
-> setGreeting txt = greeting != txt
+> setGreeting :: Text -> Update GreetingState ()
+> setGreeting txt = put $ GreetingState txt
 >
 > $(makeAcidic ''GreetingState ['getGreeting, 'setGreeting])
 
-
-
 Now that we have two states we can create a type to bundle them up like:
-
-
 
 > data Acid = Acid
 >    { acidCountState    :: AcidState CountState

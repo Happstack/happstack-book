@@ -1,3 +1,3 @@
-%Happstack: The Book
+%The Happstack Book: Modern, Type-Safe Web Development in Haskell
 %Jeremy Shaw
 

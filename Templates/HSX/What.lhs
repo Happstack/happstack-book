@@ -248,6 +248,8 @@ First we have a simple function to render the pages and print them to stdout:
 
 > {-# LANGUAGE FlexibleContexts, QuasiQuotes,
 >     TypeFamilies, OverloadedStrings #-}
+> module Main where
+>
 > import Control.Monad.Identity      (Identity(..))
 > import           Data.Text.Lazy    (Text)
 > import qualified Data.Text.Lazy.IO as Text
@@ -314,8 +316,8 @@ instance EmbedAsChild (HSPT XML m) () where
 So, we can just pass in `()` like so:
 
 
-> empty :: IO ()
-> empty = printXML $ defaultTemplate "empty" () ()
+> main :: IO ()
+> main = printXML $ defaultTemplate "empty" () ()
 
 Which will render as such:
 

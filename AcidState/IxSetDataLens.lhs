@@ -19,7 +19,7 @@ It can take a bit of practice to get used to lenses. But, fortunately, using the
 >
 > import Control.Applicative (pure)
 > import Control.Category   ((.), (>>>))
-> import Control.Comonad.Trans.Store.Lazy
+> -- import Control.Comonad.Trans.Store.Lazy
 > import Data.Acid          (Update)
 > import Data.Data          (Data, Typeable)
 > import Data.IxSet         ( IxSet, Indexable(empty), (@=)
@@ -30,7 +30,7 @@ It can take a bit of practice to get used to lenses. But, fortunately, using the
 >                           )
 > import Data.Lens.Template (makeLens)
 > import Data.Lens.IxSet    (ixLens)
-> import Data.Lens.Partial.Common ( PartialLens(..), maybeLens
+> import Data.Lens.Partial.Common ( PartialLens(..), justLens
 >                                 , totalLens)
 > import Data.SafeCopy      (SafeCopy, base, deriveSafeCopy)
 > import Data.Text          (Text)
@@ -468,7 +468,7 @@ We can turn our `ixLens` into a partial lens like this:
 > --   modifies a value if the key already exists in the map.
 > ixPLens :: (Typeable key, Ord a, Typeable a, Indexable a) =>
 >            key -> PartialLens (IxSet a) a
-> ixPLens key = maybeLens . totalLens (ixLens key)
+> ixPLens key = justLens . totalLens (ixLens key)
 
 See the [haddock page](http://hackage.haskell.org/package/partial-lens) for `partial-lens` for more information. Using `partial-lens` is very similar to a normal lens.
 
