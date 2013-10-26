@@ -580,7 +580,7 @@ And finally, we just have our `route` table and `main` function:
 > main :: IO ()
 > main = simpleHTTP nullConf $ withI18N routes
 
-Source code for the app is [here](http://srclink/TemplatesHSP.hs).
+Source code for the app is [here](http://srclink/Templates/HSX/I18n.hs).
 You will also need to download and unzip the message files [here](http://srclink/messages.zip).
 
 Conclusions
