@@ -449,7 +449,7 @@ this trick works better when you are only attempting to add a single extra attri
 >      </div> |]
 
 
-Source code for the app is [here](http://srclink/HSX/What.hs).
+Source code for the app is [here](http://srclink/Templates/HSX/What.hs).
 
 HSX and compilation errors
 --------------------------

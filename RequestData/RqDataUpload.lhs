@@ -38,12 +38,13 @@ understand something, try looking in earlier material.
 > {-# LANGUAGE OverloadedStrings #-}
 > import Control.Monad    (msum)
 > import Happstack.Server
->     ( Response, ServerPart, defaultBodyPolicy
->     , decodeBody, dir, lookFile, nullConf, ok
+>     ( Response, ServerPart, Method(GET, POST), defaultBodyPolicy
+>     , decodeBody, dir, lookFile, method, nullConf, ok
 >     , simpleHTTP, toResponse )
-> import Text.Blaze                         as B
-> import Text.Blaze.Html4.Strict            as B hiding (map)
-> import Text.Blaze.Html4.Strict.Attributes as B hiding (dir, title)
+> import           Text.Blaze                         ((!))
+> import qualified Text.Blaze                         as H
+> import qualified Text.Blaze.Html4.Strict            as H
+> import qualified Text.Blaze.Html4.Strict.Attributes as A
 
 > main :: IO ()
 > main = simpleHTTP nullConf $ upload
@@ -56,30 +57,34 @@ understand something, try looking in earlier material.
 >             ]
 >
 > uploadForm :: ServerPart Response
-> uploadForm = ok $ toResponse $
->     html $ do
->       B.head $ do
->         title "Upload Form"
->       B.body $ do
->         form ! enctype "multipart/form-data"
->              ! B.method "POST"
->              ! action "/post" $ do
->                input ! type_ "file" ! name "file_upload" ! size "40"
->                input ! type_ "submit" ! value "upload"
+> uploadForm =
+>     do method GET
+>        ok $ toResponse $
+>         H.html $ do
+>          H.head $ do
+>          H.title "Upload Form"
+>          H.body $ do
+>           H.form ! A.enctype "multipart/form-data"
+>                  ! A.method "POST"
+>                  ! A.action "/post" $ do
+>                    H.input ! A.type_ "file" ! A.name "file_upload" ! A.size "40"
+>                    H.input ! A.type_ "submit" ! A.value "upload"
 >
 > post :: ServerPart Response
 > post =
->    do r <- lookFile "file_upload"
+>    do method POST
+>       r <- lookFile "file_upload"
+>       -- renameFile (tmpFile r) permanentName
 >       ok $ toResponse $
->          html $ do
->            B.head $ do
->              title "Post Data"
->            B.body $ mkBody r
+>          H.html $ do
+>            H.head $ do
+>              H.title "Post Data"
+>            H.body $ mkBody r
 >     where
 >       mkBody (tmpFile, uploadName, contentType) = do
->         p (toHtml $ "temporary file: " ++ tmpFile)
->         p (toHtml $ "uploaded name:  " ++ uploadName)
->         p (toHtml $ "content-type:   " ++ show contentType)
+>         H.p (H.toHtml $ "temporary file: " ++ tmpFile)
+>         H.p (H.toHtml $ "uploaded name:  " ++ uploadName)
+>         H.p (H.toHtml $ "content-type:   " ++ show contentType)
 
 Source code for the app is [here](http://srclink/RequestData/RqDataUpload.hs).
 
@@ -87,6 +92,6 @@ File uploads important reminder
 -------------------------------
 
 Remember that you must move the temporary file to a new location or it
-will be garbage collected after the Response is sent. In the example
+will be garbage collected after the 'Response' is sent. In the example
 code we do *not* move the file, so it is automatically deleted.
 

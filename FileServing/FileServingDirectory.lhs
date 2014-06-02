@@ -69,7 +69,7 @@ The following demo will allow you to browse the directory that the server is run
 > main :: IO ()
 > main = simpleHTTP nullConf $ serveDirectory EnableBrowsing [] "."
 
-Source code for the app is [here](http://srclink/FileServingDirectory.hs).
+Source code for the app is [here](http://srclink/FileServing/FileServingDirectory.hs).
 
 Simply run it and point your browser at [http://localhost:8000/](http://localhost:8000/)
 
