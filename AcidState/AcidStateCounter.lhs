@@ -202,7 +202,7 @@ update' :: (UpdateEvent IncCountBy, MonadIO m) =>
 
 As mentioned earlier, the underlying update and query events we created are pure functions. But, in order to have a durable database (aka, be able to recover after powerloss, etc) we do need to log the update events to disk so that we can reply them in the event of a recovery. So, rather than invoke our update and query events directly, we call them indirectly via the `update` and `query` functions. `update` and `query` interact with the `acid-state` system to ensure that the acid-state events are properly logged, called in the correct order, run atomitically and isolated, etc.
 
-There is no way in Haskell to save a function to save a function to disk or send it over the network. So, `acid-state` has to cheat a little. Instead of storing the function, it just stores the name of the function and the value of its arguments. That is what the `IncCountBy` type is for -- it is the value that can be serialized and saved to disk or sent over the network.
+There is no way in Haskell to save a function to disk or send it over the network. So, `acid-state` has to cheat a little. Instead of storing the function, it just stores the name of the function and the value of its arguments. That is what the `IncCountBy` type is for -- it is the value that can be serialized and saved to disk or sent over the network.
 
 Finally, we have our main function:
 
