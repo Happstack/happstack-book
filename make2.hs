@@ -7,6 +7,7 @@ import Development.Shake
 import Development.Shake.FilePath
 import SoHFilter (FixupMode(Consolidate, Remove), sohFilter)
 import System.Exit (ExitCode(..))
+import Prelude hiding ((*>))
 
 chapters :: [FilePath]
 chapters = [ "title.txt"
@@ -72,7 +73,7 @@ allChaptersSoH = "_build/allChaptersSoH.md"
 main :: IO ()
 main = shakeArgs shakeOptions $ do
          let src  = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
-             tgts = ["_build/happstack-book.html", "_build/happstack-book.pdf", "_build/happstack-book.epub", "_build/happstack-book.mobi", "_build/book.md", "_build/theme.css", "_build/src/messages.zip"] ++ src
+             tgts = ["_build/happstack-book.html", "_build/happstack-book.pdf", "_build/happstack-book.epub", "_build/happstack-book.mobi", "_build/happstack-book.md", "_build/theme.css", "_build/src/messages.zip"] ++ src
          want tgts
          allChapters *> \out ->
              do need (these ++ chapters)
@@ -105,6 +106,7 @@ main = shakeArgs shakeOptions $ do
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
                 system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","theme.css","-o", out, allChapters]
                 system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/src/g", out]
+                system' "ln"  ["-s", "-f", "happstack-book.html", "_build/index.html"]
          "_build/happstack-book.pdf" *> \out ->
              do need $ allChapters:these
                 system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
@@ -136,7 +138,7 @@ main = shakeArgs shakeOptions $ do
                   mapM_ (\hs -> system' "ghc" ["-fno-code", hs]) src
          phony "publish" $
              do need tgts
-                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "jeremy@happstack.com:public_html/happstack-crashcourse/"]
+                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "ubuntu@aws1.seereason.com:/home/jeremy/public_html/happstack-crashcourse/"]
 
 --	rsync -avxz --exclude '*.o' --exclude '*.hi' html/ jeremy@happstack.com:public_html/happstack-crashcourse/
 

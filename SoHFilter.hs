@@ -25,7 +25,10 @@ sohFilter Remove contents = liftIO $
                                                               , Ext_backtick_code_blocks
                                                               , Ext_pandoc_title_block
                                                               ] } -}
-       return $ writeMarkdown writerOpts $ bottomUp remove $ readMarkdown readerOpts contents
+       case readMarkdown readerOpts contents of
+         (Right p) ->
+             return $ writeMarkdown writerOpts (bottomUp remove p)
+         (Left e) -> error (show e)
 
 sohFilter Consolidate contents = liftIO $
     do let readerOpts = def { readerExtensions = Set.fromList [ Ext_literate_haskell
@@ -37,8 +40,9 @@ sohFilter Consolidate contents = liftIO $
            writerOpts = def { writerExtensions = Set.fromList [ Ext_fenced_code_attributes
                                                               , Ext_backtick_code_blocks
                                                               ] }
-
-       return $ writeMarkdown writerOpts $ bottomUp consolidate $ readMarkdown readerOpts contents
+       case readMarkdown readerOpts contents of
+         (Right p) -> return $ writeMarkdown writerOpts (bottomUp consolidate p)
+         (Left e) -> error (show e)
 
 data FixupMode
     = Consolidate
