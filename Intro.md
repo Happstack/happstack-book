@@ -41,8 +41,8 @@ any mistakes, formatting errors, bad links, etc, please report them to
 jeremy@n-heptane.com.
 
 In addition to the HTML version of this book you can also read it in
-[PDF](happstack-book.pdf), [EPUB/NOOK](happstack-book.epub), and
-[Mobi/Kindle](happstack-book.mobi).
+[PDF](happstack-book.pdf) and [EPUB/NOOK](happstack-book.epub).
+
 
 
 

@@ -66,10 +66,11 @@ It is convenient to assign a unique id to each blog post so that it can be easil
 
 
 > newtype PostId = PostId { unPostId :: Integer }
->     deriving (Eq, Ord, Data, Enum, Typeable, SafeCopy)
+>     deriving (Eq, Ord, Data, Enum, Typeable)
+>
+> $(deriveSafeCopy 0 'base ''PostId)
 
-
-Note that in addition to deriving normal classes like `Eq` and `Ord`, we also derive an instance of `SafeCopy`. This is not required by `IxSet` itself, but since we want to store the our blog posts in `acid-state` we will need it there.
+Note that in addition to deriving normal classes like `Eq` and `Ord`, we use template haskell to derive an instance of `SafeCopy`. This is not required by `IxSet` itself, but since we want to store the our blog posts in `acid-state` we will need it there.
 
 A blog post will be able to have two statuses 'draft' and 'published'. We could use a boolean value, but it is easier to understand what `Draft` and `Published` mean instead of trying to remember what `True` and `False` mean. Additionally, we can easily extend the type with additional statuses later.
 
@@ -103,13 +104,21 @@ Each `IxSet` key needs to have a unique type. Looking at `Post` it seems like th
 
 
 > newtype Title     = Title Text
->     deriving (Eq, Ord, Data, Typeable, SafeCopy)
+>     deriving (Eq, Ord, Data, Typeable)
+> $(deriveSafeCopy 0 'base ''Title)
+>
 > newtype Author    = Author Text
->     deriving (Eq, Ord, Data, Typeable, SafeCopy)
+>     deriving (Eq, Ord, Data, Typeable)
+> $(deriveSafeCopy 0 'base ''Author)
+>
 > newtype Tag       = Tag Text
->     deriving (Eq, Ord, Data, Typeable, SafeCopy)
+>     deriving (Eq, Ord, Data, Typeable)
+> $(deriveSafeCopy 0 'base ''Tag)
+>
 > newtype WordCount = WordCount Int
->     deriving (Eq, Ord, Data, Typeable, SafeCopy)
+>     deriving (Eq, Ord, Data, Typeable)
+> $(deriveSafeCopy 0 'base ''WordCount)
+>
 
 
 %%% Defining the indexing keys

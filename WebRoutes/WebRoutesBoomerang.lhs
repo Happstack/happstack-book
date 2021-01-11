@@ -35,7 +35,7 @@ The first thing to notice is that we hide `id` and `(.)` from the `Prelude` and 
 >     ( Response, ServerPartT, ok, toResponse, simpleHTTP
 >     , nullConf, seeOther, dir, notFound, seeOther)
 > import Text.Blaze.Html4.Strict
->     ( (!), html, head, body, title, p, toHtml
+>     ( Html, (!), html, head, body, title, p, toHtml
 >     , toValue, ol, li, a)
 > import Text.Blaze.Html4.Strict.Attributes (href)
 > import Text.Boomerang.TH       (makeBoomerangs)
@@ -218,6 +218,7 @@ Next, we have the handler functions. These are also exactly the same as the prev
 >       a ! href (toValue userOverview) $ "User Overview"
 >       ol $ mconcat articles
 >   where
+>    mkArticle :: ArticleId -> RouteT Sitemap (ServerPartT IO) Html
 >    mkArticle articleId = do
 >     url <- showURL (Article articleId)
 >     return $ li $ a ! href (toValue url) $
@@ -247,6 +248,7 @@ Next, we have the handler functions. These are also exactly the same as the prev
 >       body $ do
 >         ol $ mconcat users
 >   where
+>     mkUser :: Int -> RouteT Sitemap (ServerPartT IO) Html
 >     mkUser userId = do
 >       url <- showURL (UserDetail userId
 >                       (fromString $ "user " ++ show userId))

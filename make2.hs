@@ -5,9 +5,11 @@ import Control.Monad              ((<=<), mzero)
 import Data.List                  (intersperse, isSuffixOf)
 import Development.Shake
 import Development.Shake.FilePath
-import SoHFilter (FixupMode(Consolidate, Remove), sohFilter)
+-- import SoHFilter (FixupMode(Consolidate, Remove), sohFilter)
 import System.Exit (ExitCode(..))
 import Prelude hiding ((*>))
+
+system' = cmd_
 
 chapters :: [FilePath]
 chapters = [ "title.txt"
@@ -30,7 +32,7 @@ chapters = [ "title.txt"
            , "Templates/HSX/What.lhs"
            , "Templates/HSX/WhatMore.md"
            , "Templates/HSX/I18n.cpp.lhs"
-           , "Templates/Heist/TemplatesHeist.lhs"
+--           , "Templates/Heist/TemplatesHeist.lhs"
            , "Templates/JMacro.lhs"
            , "RequestData/RqDataIntro.md"
            , "RequestData/HelloRqData.lhs"
@@ -73,7 +75,7 @@ allChaptersSoH = "_build/allChaptersSoH.md"
 main :: IO ()
 main = shakeArgs shakeOptions $ do
          let src  = map (\f -> "_build/src" </> (f -<.> "hs")) $ filter (isSuffixOf ".lhs") chapters
-             tgts = ["_build/happstack-book.html", "_build/happstack-book.pdf", "_build/happstack-book.epub", "_build/happstack-book.mobi", "_build/happstack-book.md", "_build/theme.css", "_build/src/messages.zip"] ++ src
+             tgts = ["_build/happstack-book.html", "_build/happstack-book.pdf", "_build/happstack-book.epub", {- "_build/happstack-book.mobi", -} {- "_build/happstack-book.md", -} "_build/theme.css", "_build/src/messages.zip"] ++ src
          want tgts
          allChapters *> \out ->
              do need (these ++ chapters)
@@ -104,12 +106,12 @@ main = shakeArgs shakeOptions $ do
              do need $ allChapters : these
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css","-o", out, allChapters]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","http://happstack.com/docs/crashcourse/theme/theme.css","-o", out, allChapters]
-                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--chapters","--css","theme.css","-o", out, allChapters]
+                system' "pandoc" ["-f", "markdown+lhs","-t","html5","-s","--toc","--top-level-division","chapter","--css","theme.css","-o", out, allChapters]
                 system' "sed" ["-i","s/srclink/www\\.happstack\\.com\\/docs\\/crashcourse\\/src/g", out]
                 system' "ln"  ["-s", "-f", "happstack-book.html", "_build/index.html"]
          "_build/happstack-book.pdf" *> \out ->
              do need $ allChapters:these
-                system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--latex-engine","pdflatex","--toc","--chapters","-o", out, allChapters]
+                system' "pandoc" ["-V", "documentclass:book", "-f", "markdown+lhs","--pdf-engine","pdflatex","--toc","--top-level-division=chapter","-o", out, allChapters]
          "_build/happstack-book.epub" *> \out ->
              do need $ allChapters:these
                 system' "pandoc" ["-f", "markdown+lhs","-o", out, allChapters]
@@ -119,6 +121,7 @@ main = shakeArgs shakeOptions $ do
                 if (c == ExitSuccess) || (c == ExitFailure 1)
                    then return ()
                    else error $ "kindlgen failed with exit code: " ++ show c
+{-
          "_build/happstack-book.md" *> \out ->
              do need $ chapters++these
                      -- FIXME: probably needs to call loadFile
@@ -129,6 +132,7 @@ main = shakeArgs shakeOptions $ do
                 system' "sed" ["-i", "s/import Happstack.Server/import Happstack.Server.Env/", out]
                 system' "sed" ["-i", "s/sourceCode literate haskell/haskell web active/", out]
 --                system' "pandoc" ["-f", "markdown+lhs","-t","markdown_soh","-o", out, allChapters_]
+-}
          "_build/src/messages.zip" *> \out ->
              do msgs <- getDirectoryFiles "." ["messages//*.msg"]
                 need msgs
@@ -138,7 +142,7 @@ main = shakeArgs shakeOptions $ do
                   mapM_ (\hs -> system' "ghc" ["-fno-code", hs]) src
          phony "publish" $
              do need tgts
-                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "ubuntu@aws1.seereason.com:/home/jeremy/public_html/happstack-crashcourse/"]
+                system' "rsync" ["-avxz", "--exclude","*.o","--exclude", "*.hi", "_build/", "jeremy@happstack.com:/home/jeremy/public_html/happstack-crashcourse/"]
 
 --	rsync -avxz --exclude '*.o' --exclude '*.hi' html/ jeremy@happstack.com:public_html/happstack-crashcourse/
 

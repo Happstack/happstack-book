@@ -20,7 +20,7 @@ In order to run this demo you will need to install `web-routes`, `web-routes-th`
 >     ( Response, ServerPartT, ok, toResponse, simpleHTTP
 >     , nullConf, seeOther, dir, notFound, seeOther)
 > import Text.Blaze.Html4.Strict
->     ( (!), html, head, body, title, p, toHtml
+>     ( Html, (!), html, head, body, title, p, toHtml
 >     , toValue, ol, li, a)
 > import Text.Blaze.Html4.Strict.Attributes (href)
 > import Web.Routes
@@ -119,6 +119,7 @@ Next, we have the handler functions:
 >       body $ do
 >         ol $ mconcat articles
 >   where
+>     mkArticle :: ArticleId -> RouteT Sitemap (ServerPartT IO) Html
 >     mkArticle articleId =
 >         do url <- showURL (Article articleId)
 >            return $ li $ a ! href (toValue url) $

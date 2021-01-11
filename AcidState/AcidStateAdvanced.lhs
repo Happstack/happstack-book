@@ -107,6 +107,7 @@ to automatically retrieve the the correct `AcidState` handle from whatever monad
 >      , MonadIO m
 >      , IsAcidic st
 >      , Typeable st
+>      , SafeCopy st
 >      ) =>
 >      Maybe FilePath        -- ^ path to state directory
 >   -> st                    -- ^ initial state value
@@ -264,7 +265,8 @@ Let's imagine we have this dummy plugin:
 
 
 > newtype FooState = FooState { foo :: Text }
->     deriving (Eq, Ord, Data, Typeable, SafeCopy)
+>     deriving (Eq, Ord, Data, Typeable)
+> $(deriveSafeCopy 0 'base ''FooState)
 >
 > initialFooState :: FooState
 > initialFooState = FooState { foo = "foo" }
