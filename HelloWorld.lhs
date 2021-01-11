@@ -22,7 +22,7 @@ If you want to run the code locally, and you have not already installed Happstac
 
 To build the application run:
 
-    $ ghc -threaded HelloWorld.hs -o helloworld
+    $ ghc --make -threaded HelloWorld.hs -o helloworld
 
 The executable will be named `helloworld`. You can run it like:
 
