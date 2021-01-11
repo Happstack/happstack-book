@@ -14,10 +14,6 @@ all requests with the string, `Hello, World!`.
 > main :: IO ()
 > main = simpleHTTP nullConf $ ok "Hello, World!"
 
-If you are reading this on [School of Haskell](https://www.fpcomplete.com/), the examples import the module `Happstack.Server.Env` instead of `Happstack.Server`. This is a (hopefully) temporary hack so that the interactive code examples work on School of Haskell. To run code from School of Haskell locally simply replace `Happstack.Server.Env` with `Happstack.Server`.
-
-If you are reading this on School of Haskell, you can run the examples interactively with out installing anything.
-
 If you want to run the code locally, and you have not already installed Happstack -- you will need to do that first. You can find instructions on how to install Happstack at [http://happstack.com/page/view-page-slug/2/download](http://happstack.com/page/view-page-slug/2/download).
 
 To build the application run:

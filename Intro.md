@@ -16,12 +16,6 @@ is the quickest and easiest way to get started. It uses `blaze-html`
 for HTML generation and simple dynamic routing combinators. It has a
 very small, but sufficient API, for writing many web applications.
 
-[`happstack-foundation`](http://www.youtube.com/watch?v=7Wmszk4wZxQ)
-provides a more powerful, type-safe, and feature rich starting
-point. It has type-safe URL routing, a template system that allows you
-to embed literal XML syntax in your Haskell code, integrated support
-for `acid-state` databases, type-safe form processing, and more.
-
 [`clckwrks`](http://www.clckwrks.com/) is a higher-level web framework
 built on top of the same technology that `happstack-foundation`
 uses. `clckwrks` makes it easy to develop web applications by
@@ -37,8 +31,7 @@ sections you are interested in. Each section comes with a small,
 self-contained example that you can download and run locally.
 
 This book was recently converted to a new build system. If you find
-any mistakes, formatting errors, bad links, etc, please report them to
-jeremy@n-heptane.com.
+any mistakes, formatting errors, bad links, etc, please report them here, [https://github.com/Happstack/happstack-book/issues](https://github.com/Happstack/happstack-book/issues).
 
 In addition to the HTML version of this book you can also read it in
 [PDF](happstack-book.pdf) and [EPUB/NOOK](happstack-book.epub).
